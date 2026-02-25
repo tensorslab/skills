@@ -66,15 +66,13 @@ User request: "让这张人物合影 family.jpg 动起来" or "让风景照动�
 
 **Agent processing:**
 1. Extract image file paths (1-2 images supported)
-2. For portraits/faces: set `camerafixed=1` to avoid distracting camera movement
-3. Enhance prompt with motion instructions
-4. Monitor progress with heartbeat updates
-5. Download results
+2. Enhance prompt with motion instructions
+3. Monitor progress with heartbeat updates
+4. Download results
 
 **Parameters for image-to-video:**
 - `sourceImage`: Array of image files (1-2 images max)
 - `imageUrl`: Comma-separated URLs of source images
-- `camerafixed`: Set to "1" for stable scenes (portraits, products)
 - `prompt`: Description of desired motion/animation
 
 ### 3. Resolution and Aspect Ratio
@@ -130,8 +128,8 @@ python scripts/tensorslab_video.py "a spaceship flying through space"
 # 10 second horizontal video
 python scripts/tensorslab_video.py "sunset over ocean waves" --duration 10 --ratio 16:9
 
-# Image-to-video with fixed camera
-python scripts/tensorslab_video.py "make this photo come alive" --source portrait.jpg --camera-fixed
+# Image-to-video
+python scripts/tensorslab_video.py "make this photo come alive" --source portrait.jpg
 
 # Fast preview
 python scripts/tensorslab_video.py "abstract flowing colors" --model seedancev1profast
@@ -177,7 +175,6 @@ After completion, inform user:
 - Specify style: "cinematic", "documentary style", "dreamy"
 
 ### Image-to-Video
-- Use `camerafixed` for portraits and product shots
 - Describe the desired motion: "gentle sway", "subtle movement"
 - For landscapes: "clouds moving", "water flowing", "leaves rustling"
 

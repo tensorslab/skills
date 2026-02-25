@@ -52,7 +52,6 @@ All responses follow this structure:
 | `resolution` | string | No | 480p, 720p, 1080p, 1440p, default: "1080p" |
 | `fps` | string | No | Frame rate, default: "24" |
 | `sourceImage` | file[] | No | Source images (1-2 images) |
-| `camerafixed` | string | No | "1" for fixed camera |
 | `generate_audio` | string | No | "1" to generate audio |
 | `return_last_frame` | string | No | "1" to return last frame as image |
 | `seed` | integer | No | Random seed |

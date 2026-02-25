@@ -100,7 +100,6 @@ def generate_video(
     fps: str = "24",
     source_images: Optional[List[str]] = None,
     image_url: Optional[str] = None,
-    camerafixed: bool = False,
     generate_audio: bool = False,
     return_last_frame: bool = False,
     seed: Optional[int] = None,
@@ -118,7 +117,6 @@ def generate_video(
         fps: Frame rate
         source_images: List of local image paths for image-to-video (1-2 images)
         image_url: URL of source image for image-to-video
-        camerafixed: Keep camera fixed (for stable scenes)
         generate_audio: Generate audio with video (seedancev2 only)
         return_last_frame: Return the last frame image
         seed: Random seed for reproducibility
@@ -147,8 +145,6 @@ def generate_video(
     # Add optional parameters
     if seed is not None:
         files["seed"] = (None, str(seed))
-    if camerafixed:
-        files["camerafixed"] = (None, "1")
     if generate_audio and model == "seedancev2":
         files["generate_audio"] = (None, "1")
     if return_last_frame and model == "seedancev2":
@@ -358,9 +354,6 @@ Examples:
 
   # High quality video
   python tensorslab_video.py "epic mountain timelapse" --resolution 1440p --duration 10
-
-  # Fixed camera for stable scene
-  python tensorslab_video.py "portrait talking to camera" --source face.jpg --camera-fixed
         """
     )
 
@@ -380,8 +373,6 @@ Examples:
     parser.add_argument("--source", "-s", action="append", dest="sources",
                        help="Source image path for image-to-video (can use 1-2 images)")
     parser.add_argument("--image-url", help="Source image URL for image-to-video")
-    parser.add_argument("--camera-fixed", action="store_true",
-                       help="Keep camera fixed for stable scenes")
     parser.add_argument("--audio", action="store_true",
                        help="Generate audio with video (seedancev2 only)")
     parser.add_argument("--last-frame", action="store_true",
@@ -421,7 +412,6 @@ Examples:
         fps=args.fps,
         source_images=args.sources,
         image_url=args.image_url,
-        camerafixed=args.camera_fixed,
         generate_audio=args.audio,
         return_last_frame=args.last_frame,
         seed=args.seed,
