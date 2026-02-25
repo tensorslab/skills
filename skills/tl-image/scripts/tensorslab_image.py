@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 # API Configuration
 BASE_URL = "https://test.tensorai.tensorslab.com"
-OUTPUT_DIR = Path("./tensorslab_output")
+OUTPUT_DIR = Path.home() / "tensorslab_output"
 
 # Image status codes
 IMAGE_STATUS = {

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 # API Configuration
 BASE_URL = "https://test.tensorai.tensorslab.com"
-OUTPUT_DIR = Path("./tensorslab_output")
+OUTPUT_DIR = Path.home() / "tensorslab_output"
 
 # Task status codes
 TASK_STATUS = {
@@ -96,7 +96,7 @@ def generate_video(
     model: str = "seedancev1profast",
     ratio: str = "9:16",
     duration: int = 5,
-    resolution: str = "1080p",
+    resolution: str = "720p",
     fps: str = "24",
     source_images: Optional[List[str]] = None,
     image_url: Optional[str] = None,
@@ -374,7 +374,7 @@ Examples:
     parser.add_argument("--duration", "-d", type=int, default=5,
                        help="Video duration in seconds (5-15, default: 5)")
     parser.add_argument("--resolution", choices=["480p", "720p", "1080p", "1440p"],
-                       default="1080p", help="Video resolution (default: 1080p)")
+                       default="720p", help="Video resolution (default: 720p)")
     parser.add_argument("--fps", "-f", default="24",
                        help="Frame rate (default: 24)")
     parser.add_argument("--source", "-s", action="append", dest="sources",

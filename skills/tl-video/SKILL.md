@@ -38,7 +38,7 @@ If not set, display this friendly message:
 | **seedancev1profast** | Fast generation | Quick previews | 10s |
 | **seedancev1** | Standard lite | Basic videos | 10s |
 
-Default: `seedancev2`
+Default: `seedancev1profast`
 
 ## Workflow
 
@@ -86,8 +86,8 @@ User request: "让这张人物合影 family.jpg 动起来" or "让风景照动�
 
 **Resolutions:**
 - `480p` - SD quality, faster generation
-- `720p` - HD quality
-- `1080p` - Full HD - **default for seedancev2**
+- `720p` - HD quality - **default**
+- `1080p` - Full HD
 - `1440p` - 2K quality (seedancev2 only)
 
 ### 4. Duration Options
