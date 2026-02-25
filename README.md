@@ -49,15 +49,15 @@ This repository contains a few skills to get you started. You can also contribut
 <!-- BEGIN_SKILLS_TABLE -->
 | Name | Description | Documentation |
 |------|-------------|---------------|
-| `tl-image` | Generate images using TensorAI's AI image generation models. Supports text-to-image and image-to-image generation with automatic prompt enhancement, progress tracking, and local file saving. | [SKILL.md](skills/tl-image/SKILL.md) |
-| `tl-video` | Generate videos using TensorAI's AI video generation models. Supports text-to-video and image-to-video generation with automatic prompt enhancement, progress tracking, and local file saving. | [SKILL.md](skills/tl-video/SKILL.md) |
+| `tl-image` | Generate images using TensorsLab's AI image generation models. Supports text-to-image and image-to-image generation with automatic prompt enhancement, progress tracking, and local file saving. | [SKILL.md](skills/tl-image/SKILL.md) |
+| `tl-video` | Generate videos using TensorsLab's AI video generation models. Supports text-to-video and image-to-video generation with automatic prompt enhancement, progress tracking, and local file saving. | [SKILL.md](skills/tl-video/SKILL.md) |
 <!-- END_SKILLS_TABLE -->
 
 ### Environment Setup
 
-Before using the TensorAI skills, you need to configure your API key:
+Before using the TensorsLab skills, you need to configure your API key:
 
-You can get your API Key at [TensorAI Console](https://tensorai.tensorslab.com/).
+You can get your API Key at [TensorsLab Console](https://tensorai.tensorslab.com/).
 
 ```bash
 # Windows (PowerShell)

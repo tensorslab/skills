@@ -1,4 +1,4 @@
-# TensorAI Image API Reference
+# TensorsLab Image API Reference
 
 ## Base URL
 

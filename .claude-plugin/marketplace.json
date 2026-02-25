@@ -1,24 +1,24 @@
 {
-  "name": "tensorai-skills",
+  "name": "tensorslab-skills",
   "owner": {
-    "name": "TensorAI"
+    "name": "TensorsLab"
   },
   "metadata": {
-    "description": "Powerful Agent Skills for image and video generation tasks using TensorAI. Support Text-to-Image, Image-to-Image, Text-to-Video and Image-to-Video via natural language prompt.",
+    "description": "Powerful Agent Skills for image and video generation tasks using TensorsLab. Support Text-to-Image, Image-to-Image, Text-to-Video and Image-to-Video via natural language prompt.",
     "version": "1.0.0"
   },
   "plugins": [
     {
-      "name": "tensorai-image",
-      "source": "./skills/tensorai-image",
+      "name": "tensorslab-image",
+      "source": "./skills/tl-image",
       "skills": "./",
-      "description": "TensorAI Image Generation Skill. Seamlessly generate high-quality images via Text-to-Image or edit/synthesize using Image-to-Image. Features intelligent prompt enrichment and automated local file delivery."
+      "description": "TensorsLab Image Generation Skill. Seamlessly generate high-quality images via Text-to-Image or edit/synthesize using Image-to-Image. Features intelligent prompt enrichment and automated local file delivery."
     },
     {
-      "name": "tensorai-video",
-      "source": "./skills/tensorai-video",
+      "name": "tensorslab-video",
+      "source": "./skills/tl-video",
       "skills": "./",
-      "description": "TensorAI Video Generation Skill. Effortlessly create stunning videos via Text-to-Video or animate images via Image-to-Video. Includes automatic scene property deduction, real-time terminal progress tracking, and seamless local downloads."
+      "description": "TensorsLab Video Generation Skill. Effortlessly create stunning videos via Text-to-Video or animate images via Image-to-Video. Includes automatic scene property deduction, real-time terminal progress tracking, and seamless local downloads."
     }
   ]
 }

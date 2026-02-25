@@ -1,13 +1,13 @@
 ---
-name: tensorai-image
-description: Generate images using TensorAI's AI image generation models. Supports text-to-image and image-to-image generation with automatic prompt enhancement, progress tracking, and local file saving. Use for generating images from text descriptions, transforming existing images, creating artistic renderings, batch generation, and various resolutions. Requires TENSORAI_API_KEY environment variable.
+name: tensorslab-image
+description: Generate images using TensorsLab's AI image generation models. Supports text-to-image and image-to-image generation with automatic prompt enhancement, progress tracking, and local file saving. Use for generating images from text descriptions, transforming existing images, creating artistic renderings, batch generation, and various resolutions. Requires TENSORAI_API_KEY environment variable.
 ---
 
-# TensorAI Image Generation
+# TensorsLab Image Generation
 
 ## Overview
 
-This skill enables AI-powered image generation through TensorAI's API, supporting both text-to-image and image-to-image workflows. The agent enhances user prompts with detailed visual descriptions before calling the API, ensuring high-quality outputs.
+This skill enables AI-powered image generation through TensorsLab's API, supporting both text-to-image and image-to-image workflows. The agent enhances user prompts with detailed visual descriptions before calling the API, ensuring high-quality outputs.
 
 ## Authentication Check
 
@@ -50,7 +50,7 @@ User request: "画一个在月球上吃热狗的宇航员"
 2. Enhance prompt with details (lighting, composition, style, atmosphere)
 3. Call API with enriched prompt
 4. Monitor progress with heartbeat updates
-5. Download to `./tensorai_output/`
+5. Download to `./tensorslab_output/`
 
 **Example enhanced prompt:**
 ```
@@ -95,19 +95,19 @@ Execute the Python script directly:
 
 ```bash
 # Text-to-image
-python scripts/tensorai_image.py "a cat on the moon"
+python scripts/tensorslab_image.py "a cat on the moon"
 
 # With specific resolution
-python scripts/tensorai_image.py "sunset over mountains" --resolution 16:9
+python scripts/tensorslab_image.py "sunset over mountains" --resolution 16:9
 
 # Image-to-image
-python scripts/tensorai_image.py "watercolor style" --source cat.png
+python scripts/tensorslab_image.py "watercolor style" --source cat.png
 
 # Batch generation
-python scripts/tensorai_image.py "abstract patterns" --batch-size 4
+python scripts/tensorslab_image.py "abstract patterns" --batch-size 4
 
 # Specify model
-python scripts/tensorai_image.py "cyberpunk city" --model seedreamv45
+python scripts/tensorslab_image.py "cyberpunk city" --model seedreamv45
 ```
 
 ## Task Status Flow
@@ -130,15 +130,15 @@ Translate API errors to user-friendly messages:
 
 ## Output
 
-All images are saved to `./tensorai_output/` with naming pattern:
+All images are saved to `./tensorslab_output/` with naming pattern:
 - `{task_id}_{index}.{ext}` - e.g., `abcd_1234567890_0.png`
 
 After completion, inform user:
 ```
-🎉 您的图片处理完毕！已存放于 ./tensorai_output/{filename}
+🎉 您的图片处理完毕！已存放于 ./tensorslab_output/{filename}
 ```
 
 ## Resources
 
-- **scripts/tensorai_image.py**: Main API client with full CLI support
+- **scripts/tensorslab_image.py**: Main API client with full CLI support
 - **references/api_reference.md**: Detailed API documentation

@@ -1,4 +1,4 @@
-# TensorAI Video API Reference
+# TensorsLab Video API Reference
 
 ## Base URL
 

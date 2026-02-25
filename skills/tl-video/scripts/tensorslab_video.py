@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-TensorAI Video Generation API Client
+TensorsLab Video Generation API Client
 
-Supports text-to-video and image-to-video generation using TensorAI's models.
+Supports text-to-video and image-to-video generation using TensorsLab's models.
 """
 
 import os
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 # API Configuration
 BASE_URL = "https://test.tensorai.tensorslab.com"
-OUTPUT_DIR = Path("./tensorai_output")
+OUTPUT_DIR = Path("./tensorslab_output")
 
 # Task status codes
 TASK_STATUS = {
@@ -107,7 +107,7 @@ def generate_video(
     api_key: Optional[str] = None
 ) -> str:
     """
-    Generate a video using TensorAI API.
+    Generate a video using TensorsLab API.
 
     Args:
         prompt: Text prompt for video generation
@@ -122,7 +122,7 @@ def generate_video(
         generate_audio: Generate audio with video (seedancev2 only)
         return_last_frame: Return the last frame image
         seed: Random seed for reproducibility
-        api_key: TensorAI API key (uses env var if not provided)
+        api_key: TensorsLab API key (uses env var if not provided)
 
     Returns:
         Task ID for tracking generation status
@@ -200,7 +200,7 @@ def generate_video(
             error_msg = result.get("msg", "Unknown error")
             error_code = result.get("code")
             if error_code == 9000:
-                logger.error("❌ Error: Insufficient credits. Please top up at https://tensorai.tensorslab.com/")
+                logger.error("❌ Error: Insufficient credits. Please top up at https://tensorslab.tensorslab.com/")
             else:
                 logger.error(f"❌ Error: {error_msg} (Code: {error_code})")
             sys.exit(1)
@@ -219,7 +219,7 @@ def query_task_status(task_id: str, api_key: Optional[str] = None, more_info: bo
 
     Args:
         task_id: Task ID to query
-        api_key: TensorAI API key (uses env var if not provided)
+        api_key: TensorsLab API key (uses env var if not provided)
         more_info: Whether to request more detailed task information
 
     Returns:
@@ -267,7 +267,7 @@ def wait_and_download(
 
     Args:
         task_id: Task ID to wait for
-        api_key: TensorAI API key (uses env var if not provided)
+        api_key: TensorsLab API key (uses env var if not provided)
         poll_interval: Seconds between status checks
         timeout: Maximum seconds to wait (default 30 minutes)
 
@@ -340,27 +340,27 @@ def wait_and_download(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate videos using TensorAI API",
+        description="Generate videos using TensorsLab API",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   # Text-to-video (default settings)
-  python tensorai_video.py "a spaceship flying through space"
+  python tensorslab_video.py "a spaceship flying through space"
 
   # Specify duration and aspect ratio
-  python tensorai_video.py "sunset over ocean waves" --duration 10 --ratio 16:9
+  python tensorslab_video.py "sunset over ocean waves" --duration 10 --ratio 16:9
 
   # Image-to-video with local file
-  python tensorai_video.py "make this photo come alive" --source photo.jpg
+  python tensorslab_video.py "make this photo come alive" --source photo.jpg
 
   # Use faster model
-  python tensorai_video.py "abstract flowing colors" --model seedancev1profast
+  python tensorslab_video.py "abstract flowing colors" --model seedancev1profast
 
   # High quality video
-  python tensorai_video.py "epic mountain timelapse" --resolution 1440p --duration 10
+  python tensorslab_video.py "epic mountain timelapse" --resolution 1440p --duration 10
 
   # Fixed camera for stable scene
-  python tensorai_video.py "portrait talking to camera" --source face.jpg --camera-fixed
+  python tensorslab_video.py "portrait talking to camera" --source face.jpg --camera-fixed
         """
     )
 
@@ -387,7 +387,7 @@ Examples:
     parser.add_argument("--last-frame", action="store_true",
                        help="Return the last frame as image (seedancev2 only)")
     parser.add_argument("--seed", type=int, help="Random seed for reproducibility")
-    parser.add_argument("--api-key", help="TensorAI API key (uses TENSORAI_API_KEY env var if not set)")
+    parser.add_argument("--api-key", help="TensorsLab API key (uses TENSORAI_API_KEY env var if not set)")
     parser.add_argument("--poll-interval", type=int, default=10,
                        help="Status check interval in seconds (default: 10)")
     parser.add_argument("--timeout", type=int, default=1800,

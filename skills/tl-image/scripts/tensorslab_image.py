@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-TensorAI Image Generation API Client
+TensorsLab Image Generation API Client
 
-Supports text-to-image and image-to-image generation using TensorAI's models.
+Supports text-to-image and image-to-image generation using TensorsLab's models.
 """
 
 import os
 import sys
 
-# Disable proxy for TensorAI API to avoid SSL renegotiation issues
+# Disable proxy for TensorsLab API to avoid SSL renegotiation issues
 # Must be done before importing requests
 for proxy_var in ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY']:
     os.environ.pop(proxy_var, None)
@@ -32,8 +32,8 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 # API Configuration
-BASE_URL = "https://test.tensorai.tensorslab.com"
-OUTPUT_DIR = Path("./tensorai_output")
+BASE_URL = "https://test.tensorslab.tensorslab.com"
+OUTPUT_DIR = Path("./tensorslab_output")
 
 # Image status codes
 IMAGE_STATUS = {
@@ -57,7 +57,7 @@ def get_api_key() -> str:
     if not api_key:
         logger.error("Error: TENSORAI_API_KEY environment variable is not set.")
         logger.info("\nTo get your API key:")
-        logger.info("1. Visit https://tensorai.tensorslab.com/ and subscribe")
+        logger.info("1. Visit https://tensorslab.tensorslab.com/ and subscribe")
         logger.info("2. Get your API Key from the console")
         logger.info("3. Set the environment variable:")
         logger.info("   - Windows (PowerShell): $env:TENSORAI_API_KEY=\"your-key-here\"")
@@ -109,7 +109,7 @@ def generate_image(
     api_key: Optional[str] = None
 ) -> str:
     """
-    Generate an image using TensorAI API.
+    Generate an image using TensorsLab API.
 
     Args:
         prompt: Text prompt for image generation
@@ -117,7 +117,7 @@ def generate_image(
         resolution: Image resolution (aspect ratio like "16:9", "1:1", or level like "2K", "4K", or WxH like "2048x2048")
         source_images: List of local image paths for image-to-image
         image_url: URL of source image for image-to-image
-        api_key: TensorAI API key (uses env var if not provided)
+        api_key: TensorsLab API key (uses env var if not provided)
 
     Returns:
         Task ID for tracking generation status
@@ -185,7 +185,7 @@ def generate_image(
             error_msg = result.get("msg", "Unknown error")
             error_code = result.get("code")
             if error_code == 9000:
-                logger.error("❌ Error: Insufficient credits. Please top up at https://tensorai.tensorslab.com/")
+                logger.error("❌ Error: Insufficient credits. Please top up at https://tensorslab.tensorslab.com/")
             else:
                 logger.error(f"❌ Error: {error_msg} (Code: {error_code})")
             sys.exit(1)
@@ -204,7 +204,7 @@ def query_task_status(task_id: str, api_key: Optional[str] = None) -> dict:
 
     Args:
         task_id: Task ID to query
-        api_key: TensorAI API key (uses env var if not provided)
+        api_key: TensorsLab API key (uses env var if not provided)
 
     Returns:
         Task status information
@@ -251,7 +251,7 @@ def wait_and_download(
 
     Args:
         task_id: Task ID to wait for
-        api_key: TensorAI API key (uses env var if not provided)
+        api_key: TensorsLab API key (uses env var if not provided)
         poll_interval: Seconds between status checks
         timeout: Maximum seconds to wait
 
@@ -312,18 +312,18 @@ def wait_and_download(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate images using TensorAI API",
+        description="Generate images using TensorsLab API",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   # Text-to-image
-  python tensorai_image.py "a cat on the moon"
+  python tensorslab_image.py "a cat on the moon"
 
   # Image-to-image with local file
-  python tensorai_image.py "make this look like a watercolor painting" --source cat.png
+  python tensorslab_image.py "make this look like a watercolor painting" --source cat.png
 
   # Specify model and resolution
-  python tensorai_image.py "a sunset over mountains" --model seedreamv45 --resolution 16:9
+  python tensorslab_image.py "a sunset over mountains" --model seedreamv45 --resolution 16:9
         """
     )
 
@@ -335,7 +335,7 @@ Examples:
     parser.add_argument("--source", "-s", action="append", dest="sources",
                        help="Source image path for image-to-image (can be used multiple times)")
     parser.add_argument("--image-url", help="Source image URL for image-to-image")
-    parser.add_argument("--api-key", help="TensorAI API key (uses TENSORAI_API_KEY env var if not set)")
+    parser.add_argument("--api-key", help="TensorsLab API key (uses TENSORAI_API_KEY env var if not set)")
     parser.add_argument("--poll-interval", type=int, default=5,
                        help="Status check interval in seconds (default: 5)")
     parser.add_argument("--timeout", type=int, default=300,

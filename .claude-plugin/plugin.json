@@ -1,15 +1,15 @@
 {
-  "name": "tensorai-skills",
-  "description": "Powerful Agent Skills for image and video generation tasks using TensorAI. Support Text-to-Image, Image-to-Image, Text-to-Video and Image-to-Video via natural language prompt.",
+  "name": "tensorslab-skills",
+  "description": "Powerful Agent Skills for image and video generation tasks using TensorsLab. Support Text-to-Image, Image-to-Image, Text-to-Video and Image-to-Video via natural language prompt.",
   "version": "1.0.0",
   "author": {
-    "name": "TensorAI"
+    "name": "TensorsLab"
   },
   "homepage": "https://github.com/bob5-tensorslab/skills",
   "repository": "https://github.com/bob5-tensorslab/skills",
   "license": "Apache-2.0",
   "keywords": [
-    "tensorai",
+    "tensorslab",
     "image-generation",
     "video-generation",
     "text-to-image",

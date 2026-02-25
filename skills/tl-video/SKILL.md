@@ -1,13 +1,13 @@
 ---
-name: tensorai-video
-description: Generate videos using TensorAI's AI video generation models. Supports text-to-video and image-to-video generation with automatic prompt enhancement, progress tracking, and local file saving. Use for generating videos from text descriptions, animating static images, creating cinematic content, and various aspect ratios. Requires TENSORAI_API_KEY environment variable. Video generation takes several minutes.
+name: tensorslab-video
+description: Generate videos using TensorsLab's AI video generation models. Supports text-to-video and image-to-video generation with automatic prompt enhancement, progress tracking, and local file saving. Use for generating videos from text descriptions, animating static images, creating cinematic content, and various aspect ratios. Requires TENSORAI_API_KEY environment variable. Video generation takes several minutes.
 ---
 
-# TensorAI Video Generation
+# TensorsLab Video Generation
 
 ## Overview
 
-This skill enables AI-powered video generation through TensorAI's API, supporting both text-to-video and image-to-video workflows. Video generation is a time-intensive process - tasks typically take several minutes to complete.
+This skill enables AI-powered video generation through TensorsLab's API, supporting both text-to-video and image-to-video workflows. Video generation is a time-intensive process - tasks typically take several minutes to complete.
 
 ## Authentication Check
 
@@ -22,7 +22,7 @@ If not set, display this friendly message:
 
 ```
 您好！要生成高质量的内容，您需要先进行简单的配置：
-1. 访问 https://tensorai.tensorslab.com/ 登录并订阅。
+1. 访问 https://tensorslab.tensorslab.com/ 登录并订阅。
 2. 在控制台中获取您的专属 API Key。
 3. 将其保存为环境变量：
    - Windows (PowerShell): $env:TENSORAI_API_KEY="您的Key"
@@ -51,7 +51,7 @@ User request: "做一段 10 秒钟横屏的宇宙飞船穿梭星际的视频"
 2. Enhance prompt with cinematic details, camera movements, scene descriptions
 3. Call API with enriched prompt
 4. Monitor progress with heartbeat updates (every 60 seconds)
-5. Download to `./tensorai_output/`
+5. Download to `./tensorslab_output/`
 
 **Example enhanced prompt:**
 ```
@@ -125,19 +125,19 @@ Execute the Python script directly:
 
 ```bash
 # Text-to-video (default 5s, vertical 9:16)
-python scripts/tensorai_video.py "a spaceship flying through space"
+python scripts/tensorslab_video.py "a spaceship flying through space"
 
 # 10 second horizontal video
-python scripts/tensorai_video.py "sunset over ocean waves" --duration 10 --ratio 16:9
+python scripts/tensorslab_video.py "sunset over ocean waves" --duration 10 --ratio 16:9
 
 # Image-to-video with fixed camera
-python scripts/tensorai_video.py "make this photo come alive" --source portrait.jpg --camera-fixed
+python scripts/tensorslab_video.py "make this photo come alive" --source portrait.jpg --camera-fixed
 
 # Fast preview
-python scripts/tensorai_video.py "abstract flowing colors" --model seedancev1profast
+python scripts/tensorslab_video.py "abstract flowing colors" --model seedancev1profast
 
 # High quality with audio
-python scripts/tensorai_video.py "epic mountain timelapse" --resolution 1440p --duration 10 --audio
+python scripts/tensorslab_video.py "epic mountain timelapse" --resolution 1440p --duration 10 --audio
 ```
 
 ## Task Status Flow
@@ -156,17 +156,17 @@ Translate API errors to user-friendly messages:
 
 | Error Code | Meaning | User Message |
 |------------|---------|--------------|
-| 9000 | Insufficient credits | "亲，积分用完啦，请前往 https://tensorai.tensorslab.com/ 充值" |
+| 9000 | Insufficient credits | "亲，积分用完啦，请前往 https://tensorslab.tensorslab.com/ 充值" |
 | 9999 | General error | Show the specific error message |
 
 ## Output
 
-All videos are saved to `./tensorai_output/` with naming pattern:
+All videos are saved to `./tensorslab_output/` with naming pattern:
 - `{task_id}_{index}.mp4` - e.g., `abcd_1234567890_0.mp4`
 
 After completion, inform user:
 ```
-🎉 您的视频处理完毕！已存放于 ./tensorai_output/{filename}
+🎉 您的视频处理完毕！已存放于 ./tensorslab_output/{filename}
 ```
 
 ## Tips for Better Results
@@ -183,5 +183,5 @@ After completion, inform user:
 
 ## Resources
 
-- **scripts/tensorai_video.py**: Main API client with full CLI support
+- **scripts/tensorslab_video.py**: Main API client with full CLI support
 - **references/api_reference.md**: Detailed API documentation
