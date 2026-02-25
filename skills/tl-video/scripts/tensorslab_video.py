@@ -51,7 +51,7 @@ def get_api_key() -> str:
     if not api_key:
         logger.error("Error: TENSORSLAB_API_KEY environment variable is not set.")
         logger.info("\nTo get your API key:")
-        logger.info("1. Visit https://tensorai.tensorslab.com/ and subscribe")
+        logger.info("1. Visit https://test.tensorai.tensorslab.com/ and subscribe")
         logger.info("2. Get your API Key from the console")
         logger.info("3. Set the environment variable:")
         logger.info("   - Windows (PowerShell): $env:TENSORSLAB_API_KEY=\"your-key-here\"")

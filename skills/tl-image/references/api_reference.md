@@ -168,7 +168,7 @@ All responses follow this structure:
 }
 ```
 
-**User message:** "亲，积分用完啦，请前往 https://tensorai.tensorslab.com/ 充值"
+**User message:** "亲，积分用完啦，请前往 https://test.tensorai.tensorslab.com/ 充值"
 
 ### Task Failed (image_status: 4)
 
