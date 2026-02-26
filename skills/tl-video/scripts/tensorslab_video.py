@@ -133,32 +133,33 @@ def generate_video(
     }
 
     # Prepare multipart form data (like curl -F)
-    # Format: {'fieldname': (None, 'value')} for text fields
-    files = {
-        "prompt": (None, prompt),
-        "ratio": (None, ratio),
-        "duration": (None, str(duration)),
-        "resolution": (None, resolution),
-        "fps": (None, fps),
-    }
+    # Format: [("fieldname", (None, "value"))] for text fields
+    files = [
+        ("prompt", (None, prompt)),
+        ("ratio", (None, ratio)),
+        ("duration", (None, str(duration))),
+        ("resolution", (None, resolution)),
+        ("fps", (None, fps)),
+    ]
 
     # Add optional parameters
     if seed is not None:
-        files["seed"] = (None, str(seed))
+        files.append(("seed", (None, str(seed))))
     if generate_audio and model == "seedancev2":
-        files["generate_audio"] = (None, "1")
+        files.append(("generate_audio", (None, "1")))
     if return_last_frame and model == "seedancev2":
-        files["return_last_frame"] = (None, "1")
+        files.append(("return_last_frame", (None, "1")))
 
     # Prepare files for image-to-video
     opened_files = []
     if source_images:
-        for i, img_path in enumerate(source_images[:2]):  # Max 2 images
+        # Max 2 images
+        for i, img_path in enumerate(source_images[:2]):
             f = open(img_path, "rb")
             opened_files.append(f)
-            files["sourceImage"] = (os.path.basename(img_path), f)
+            files.append(("sourceImage", (os.path.basename(img_path), f)))
     elif image_url:
-        files["imageUrl"] = (None, image_url)
+        files.append(("imageUrl", (None, image_url)))
 
     # Determine endpoint
     endpoint_map = {

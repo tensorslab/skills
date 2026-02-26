@@ -130,17 +130,18 @@ def generate_image(
     }
 
     # Prepare multipart form data (like curl -F)
-    # Format: {'fieldname': (None, 'value')} for text fields
-    files = {
-        "prompt": (None, prompt),
-        "resolution": (None, resolution),
-    }
+    # Format: [("fieldname", (None, "value"))] for text fields
+    files = [
+        ("prompt", (None, prompt)),
+        ("resolution", (None, resolution)),
+    ]
 
     # Add model-specific parameters
     if model in ["seedreamv4", "seedreamv45"]:
-        files["category"] = (None, model)
+        files.append(("category", (None, model)))
     elif model == "zimage":
-        files["prompt_extend"] = (None, "1")  # Enable prompt extension
+        # Enable prompt extension
+        files.append(("prompt_extend", (None, "1")))
 
     # Handle image-to-image source images
     opened_files = []
@@ -148,9 +149,9 @@ def generate_image(
         for img_path in source_images:
             f = open(img_path, "rb")
             opened_files.append(f)
-            files["sourceImage"] = (os.path.basename(img_path), f)
+            files.append(("sourceImage", (os.path.basename(img_path), f)))
     elif image_url:
-        files["imageUrl"] = (None, image_url)
+        files.append(("imageUrl", (None, image_url)))
 
     # Determine endpoint
     if model == "zimage":
