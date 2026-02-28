@@ -136,6 +136,9 @@ python scripts/tensorslab_video.py "abstract flowing colors" --model seedancev1p
 
 # High quality with audio
 python scripts/tensorslab_video.py "epic mountain timelapse" --resolution 1440p --duration 10 --audio
+
+# Custom output directory
+python scripts/tensorslab_video.py "a sunset timelapse" --output-dir ./my_videos
 ```
 
 ## Task Status Flow
@@ -159,8 +162,10 @@ Translate API errors to user-friendly messages:
 
 ## Output
 
-All videos are saved to `./tensorslab_output/` with naming pattern:
-- `{task_id}_{index}.mp4` - e.g., `abcd_1234567890_0.mp4`
+All videos are saved to output directory with naming pattern:
+- Default: `./tensorslab_output/` (current working directory)
+- Custom: Use `--output-dir` or `-o` to specify a different path
+- Naming: `{task_id}_{index}.mp4` - e.g., `abcd_1234567890_0.mp4`
 
 After completion, inform user:
 ```

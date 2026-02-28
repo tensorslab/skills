@@ -126,6 +126,9 @@ python scripts/tensorslab_image.py "watercolor style" --source cat.png
 
 # Specify model
 python scripts/tensorslab_image.py "cyberpunk city" --model seedreamv45
+
+# Custom output directory
+python scripts/tensorslab_image.py "a beautiful landscape" --output-dir ./my_images
 ```
 
 ## Task Status Flow
@@ -148,8 +151,10 @@ Translate API errors to user-friendly messages:
 
 ## Output
 
-All images are saved to `./tensorslab_output/` with naming pattern:
-- `{task_id}_{index}.{ext}` - e.g., `abcd_1234567890_0.png`
+All images are saved to output directory with naming pattern:
+- Default: `./tensorslab_output/` (current working directory)
+- Custom: Use `--output-dir` or `-o` to specify a different path
+- Naming: `{task_id}_{index}.{ext}` - e.g., `abcd_1234567890_0.png`
 
 After completion, inform user:
 ```

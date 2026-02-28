@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 # API Configuration
 BASE_URL = "https://test.tensorai.tensorslab.com"
-OUTPUT_DIR = Path.home() / "tensorslab_output"
+DEFAULT_OUTPUT_DIR = Path(".") / "tensorslab_output"
 
 # Image status codes
 IMAGE_STATUS = {
@@ -66,9 +66,9 @@ def get_api_key() -> str:
     return api_key
 
 
-def ensure_output_dir():
+def ensure_output_dir(output_dir: Path):
     """Create output directory if it doesn't exist."""
-    OUTPUT_DIR.mkdir(exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
 
 def download_image(url: str, output_path: Path) -> Path:
@@ -245,7 +245,8 @@ def wait_and_download(
     task_id: str,
     api_key: Optional[str] = None,
     poll_interval: int = 5,
-    timeout: int = 300
+    timeout: int = 300,
+    output_dir: Optional[Path] = None
 ) -> List[str]:
     """
     Wait for task completion and download generated images.
@@ -255,14 +256,17 @@ def wait_and_download(
         api_key: TensorsLab API key (uses env var if not provided)
         poll_interval: Seconds between status checks
         timeout: Maximum seconds to wait
+        output_dir: Output directory path (default: ./tensorslab_output)
 
     Returns:
         List of downloaded file paths
     """
     if api_key is None:
         api_key = get_api_key()
+    if output_dir is None:
+        output_dir = DEFAULT_OUTPUT_DIR
 
-    ensure_output_dir()
+    ensure_output_dir(output_dir)
     downloaded_files = []
     start_time = time.time()
 
@@ -291,7 +295,7 @@ def wait_and_download(
 
             for i, url in enumerate(urls):
                 filename = f"{task_id}_{i}"
-                output_path = OUTPUT_DIR / filename
+                output_path = output_dir / filename
 
                 logger.info(f"📥 Downloading image {i+1}/{len(urls)}")
                 final_path = download_image(url, output_path)
@@ -341,6 +345,8 @@ Examples:
                        help="Status check interval in seconds (default: 5)")
     parser.add_argument("--timeout", type=int, default=300,
                        help="Maximum wait time in seconds (default: 300)")
+    parser.add_argument("--output-dir", "-o", type=str, default=None,
+                       help="Output directory path (default: ./tensorslab_output)")
 
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     args = parser.parse_args()
@@ -348,6 +354,11 @@ Examples:
     # Setup logging
     log_level = logging.DEBUG if args.debug else logging.INFO
     logging.basicConfig(level=log_level, format="%(asctime)s - %(levelname)s - %(message)s")
+
+    # Setup output directory
+    output_dir = DEFAULT_OUTPUT_DIR
+    if args.output_dir:
+        output_dir = Path(args.output_dir)
 
     # Generate image
     task_id = generate_image(
@@ -364,10 +375,11 @@ Examples:
         task_id=task_id,
         api_key=args.api_key,
         poll_interval=args.poll_interval,
-        timeout=args.timeout
+        timeout=args.timeout,
+        output_dir=output_dir
     )
 
-    logger.info(f"\n🎉 All done! Downloaded {len(downloaded)} image(s) to {OUTPUT_DIR}/")
+    logger.info(f"\n🎉 All done! Downloaded {len(downloaded)} image(s) to {output_dir}/")
     for f in downloaded:
         logger.info(f"   - {f}")
 

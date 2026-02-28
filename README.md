@@ -1,6 +1,6 @@
 # TensorLab Skills
 
-TensorLab Skills are AI task definitions for Claude Code, focusing on multimedia generation and processing using TensorsLab's AI models.
+TensorLab Skills are AI task definitions for Claude Code, focusing on multimedia generation and processing using TensorsLab's AI models. It provides comprehensive capabilities including text-to-image and image-to-image generation, advanced image editing (avatar generation, watermark removal, object erasure, face replacement), as well as text-to-video and image-to-video generation.
 
 ## How do Skills work?
 
@@ -15,19 +15,25 @@ TensorLab skills are compatible with Claude Code.
 1. Register the repository as a plugin marketplace:
 
 ```
-/plugin marketplace add https://github.com/bob5-tensorslab/skills
+/plugin marketplace add https://github.com/tensorslab/skills
 ```
 
 2. To install a skill, run:
 
 ```
-/plugin install <skill-name>@https://github.com/bob5-tensorslab/skills
+/plugin install <skill-name>@https://github.com/tensorslab/skills
 ```
 
 For example:
 
 ```
-/plugin install tl-image@https://github.com/bob5-tensorslab/skills
+/plugin install tl-image@https://github.com/tensorslab/skills
+```
+
+### opencode
+use the following command to install skills:
+```bash
+npx skills add tensorslab/skills -g -y
 ```
 
 ## Available Skills
@@ -63,4 +69,4 @@ Claude Code automatically loads the corresponding `SKILL.md` instructions and he
 
 ## References
 
-Browse the latest instructions and scripts at [tensorslab/skills](https://github.com/bob5-tensorslab/skills).
+Browse the latest instructions and scripts at [tensorslab/skills](https://github.com/tensorslab/skills).
