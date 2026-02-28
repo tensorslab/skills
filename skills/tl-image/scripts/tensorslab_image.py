@@ -32,7 +32,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 # API Configuration
-BASE_URL = "https://test.tensorai.tensorslab.com"
+BASE_URL = "https://api.tensorslab.com"
 DEFAULT_OUTPUT_DIR = Path(".") / "tensorslab_output"
 
 # Image status codes

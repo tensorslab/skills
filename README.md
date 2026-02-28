@@ -47,7 +47,7 @@ npx skills add tensorslab/skills -g -y
 
 Before using TensorsLab skills, configure your API key:
 
-Get your API Key at [TensorsLab Console](https://test.tensorai.tensorslab.com/).
+Get your API Key at [TensorsLab Console](https://tensorai.tensorslab.com/).
 
 ```bash
 # Windows (PowerShell)
