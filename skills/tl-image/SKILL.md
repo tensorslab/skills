@@ -1,6 +1,6 @@
 ---
 name: tensorslab-image
-description: Generate and edit images using TensorsLab's AI models. Supports text-to-image, image-to-image generation, plus advanced editing: avatar generation, watermark removal, object erasure, face replacement, and general image editing. Features automatic prompt enhancement, progress tracking, and local file saving. Requires TENSORSLAB_API_KEY environment variable.
+description: "Generate and edit images using TensorsLab's AI models. Supports text-to-image, image-to-image generation, plus advanced editing: avatar generation, watermark removal, object erasure, face replacement, and general image editing. Features automatic prompt enhancement, progress tracking, and local file saving. Requires TENSORSLAB_API_KEY environment variable."
 ---
 
 # TensorsLab Image Generation
