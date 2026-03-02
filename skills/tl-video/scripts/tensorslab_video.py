@@ -22,6 +22,11 @@ except ImportError:
     sys.exit(1)
 
 
+class TensorsLabAPIError(Exception):
+    """TensorsLab API error with context."""
+    pass
+
+
 logger = logging.getLogger(__name__)
 
 # API Configuration
@@ -49,14 +54,15 @@ def get_api_key() -> str:
     """Get API key from environment variable."""
     api_key = os.environ.get("TENSORSLAB_API_KEY")
     if not api_key:
-        logger.error("Error: TENSORSLAB_API_KEY environment variable is not set.")
-        logger.info("\nTo get your API key:")
-        logger.info("1. Visit https://tensorai.tensorslab.com/ and subscribe")
-        logger.info("2. Get your API Key from the console")
-        logger.info("3. Set the environment variable:")
-        logger.info("   - Windows (PowerShell): $env:TENSORSLAB_API_KEY=\"your-key-here\"")
-        logger.info("   - Mac/Linux: export TENSORSLAB_API_KEY=\"your-key-here\"")
-        sys.exit(1)
+        raise TensorsLabAPIError(
+            "TENSORSLAB_API_KEY environment variable is not set.\n"
+            "To get your API key:\n"
+            "1. Visit https://tensorai.tensorslab.com/ and subscribe\n"
+            "2. Get your API Key from the console\n"
+            "3. Set the environment variable:\n"
+            "   - Windows (PowerShell): $env:TENSORSLAB_API_KEY=\"your-key-here\"\n"
+            "   - Mac/Linux: export TENSORSLAB_API_KEY=\"your-key-here\""
+        )
     return api_key
 
 
@@ -187,7 +193,12 @@ def generate_video(
         for f in opened_files:
             f.close()
 
-        result = response.json()
+        logger.debug(f"API Response ({response.status_code}): {response.text}")
+
+        try:
+            result = response.json()
+        except ValueError:
+            raise TensorsLabAPIError(f"Invalid JSON response (HTTP {response.status_code}): {response.text}")
 
         if result.get("code") == 1000:
             task_id = result.get("data", {}).get("taskid")
@@ -197,17 +208,14 @@ def generate_video(
             error_msg = result.get("msg", "Unknown error")
             error_code = result.get("code")
             if error_code == 9000:
-                logger.error("❌ Error: Insufficient credits. Please top up at https://tensorslab.tensorslab.com/")
+                raise TensorsLabAPIError("Insufficient credits. Please top up at https://tensorslab.tensorslab.com/")
             else:
-                logger.error(f"❌ Error: {error_msg} (Code: {error_code})")
-            sys.exit(1)
+                raise TensorsLabAPIError(f"{error_msg} (Code: {error_code})")
 
+    except TensorsLabAPIError:
+        raise
     except requests.exceptions.RequestException as e:
-        logger.exception(f"❌ Network error: {e}")
-        sys.exit(1)
-    except Exception as e:
-        logger.exception(f"❌ Unexpected error: {e}")
-        sys.exit(1)
+        raise TensorsLabAPIError(f"Network error: {e}") from e
 
 
 def query_task_status(task_id: str, api_key: Optional[str] = None, more_info: bool = False) -> dict:
@@ -240,7 +248,11 @@ def query_task_status(task_id: str, api_key: Optional[str] = None, more_info: bo
             timeout=30
         )
 
-        result = response.json()
+        try:
+            result = response.json()
+        except ValueError:
+            logger.error(f"❌ API Error: Invalid JSON response (HTTP {response.status_code}): {response.text}")
+            return None
 
         if result.get("code") == 1000:
             return result.get("data", {})
@@ -248,8 +260,8 @@ def query_task_status(task_id: str, api_key: Optional[str] = None, more_info: bo
             logger.error(f"❌ Error querying task: {result.get('msg', 'Unknown error')}")
             return None
 
-    except Exception as e:
-        logger.exception(f"❌ Error querying task status: {e}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"❌ Error querying task status: {e}")
         return None
 
 
@@ -330,13 +342,11 @@ def wait_and_download(
 
         elif status == 4:  # Failed
             error_msg = task_data.get("message", "Unknown error")
-            logger.error(f"\n❌ Task failed: {error_msg}")
-            sys.exit(1)
+            raise TensorsLabAPIError(f"Task failed: {error_msg}")
 
         time.sleep(poll_interval)
 
-    logger.error(f"\n⏱️ Timeout waiting for task completion")
-    sys.exit(1)
+    raise TensorsLabAPIError(f"Timeout waiting for task completion (waited {timeout}s)")
 
 
 def main():
@@ -414,34 +424,38 @@ Examples:
         logger.error("❌ Error: maximum 2 source images allowed")
         sys.exit(1)
 
-    # Generate video
-    task_id = generate_video(
-        prompt=args.prompt,
-        model=args.model,
-        ratio=args.ratio,
-        duration=args.duration,
-        resolution=args.resolution,
-        fps=args.fps,
-        source_images=args.sources,
-        image_url=args.image_url,
-        generate_audio=args.audio,
-        return_last_frame=args.last_frame,
-        seed=args.seed,
-        api_key=args.api_key
-    )
+    try:
+        # Generate video
+        task_id = generate_video(
+            prompt=args.prompt,
+            model=args.model,
+            ratio=args.ratio,
+            duration=args.duration,
+            resolution=args.resolution,
+            fps=args.fps,
+            source_images=args.sources,
+            image_url=args.image_url,
+            generate_audio=args.audio,
+            return_last_frame=args.last_frame,
+            seed=args.seed,
+            api_key=args.api_key
+        )
 
-    # Wait and download
-    downloaded = wait_and_download(
-        task_id=task_id,
-        api_key=args.api_key,
-        poll_interval=args.poll_interval,
-        timeout=args.timeout,
-        output_dir=output_dir
-    )
+        # Wait and download
+        downloaded = wait_and_download(
+            task_id=task_id,
+            api_key=args.api_key,
+            poll_interval=args.poll_interval,
+            timeout=args.timeout,
+            output_dir=output_dir
+        )
 
-    logger.info(f"\n🎉 您的视频处理完毕！已存放于 {output_dir}/")
-    for f in downloaded:
-        logger.info(f"   - {f}")
+        logger.info(f"\n🎉 您的视频处理完毕！已存放于 {output_dir}/")
+        for f in downloaded:
+            logger.info(f"   - {f}")
+    except TensorsLabAPIError as e:
+        logger.error(f"❌ {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
