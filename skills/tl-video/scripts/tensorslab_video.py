@@ -18,8 +18,14 @@ from typing import Optional, List
 try:
     import requests
 except ImportError:
-    logger.error("Error: requests module is required. Install with: pip install requests")
-    sys.exit(1)
+    import logging as _logging
+    _logging.getLogger(__name__).error("Error: requests module is required. Install with: pip install requests")
+    import sys as _sys
+    _sys.exit(1)
+
+# 禁用代理仅限当前 session，不影响进程级环境变量
+_SESSION = requests.Session()
+_SESSION.proxies = {"http": "", "https": ""}
 
 
 class TensorsLabAPIError(Exception):
@@ -74,7 +80,7 @@ def ensure_output_dir(output_dir: Path):
 def download_video(url: str, output_path: Path) -> bool:
     """Download a video from URL to local path."""
     try:
-        response = requests.get(url, timeout=300, stream=True)
+        response = _SESSION.get(url, timeout=300, stream=True)
         response.raise_for_status()
         total_size = int(response.headers.get('content-length', 0))
 
@@ -182,14 +188,8 @@ def generate_video(
         logger.info(f"📝 Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
         logger.info(f"⚙️ Settings: {ratio} @ {resolution}, {duration}s, {fps}fps")
 
-        response = requests.post(
-            endpoint,
-            headers=headers,
-            files=files,
-            timeout=60
-        )
+        response = _SESSION.post(endpoint, headers=headers, files=files, timeout=60)
 
-        # Close any opened files
         for f in opened_files:
             f.close()
 
@@ -204,13 +204,12 @@ def generate_video(
             task_id = result.get("data", {}).get("taskid")
             logger.info(f"✅ Task created successfully! Task ID: {task_id}")
             return task_id
-        else:
-            error_msg = result.get("msg", "Unknown error")
-            error_code = result.get("code")
-            if error_code == 9000:
-                raise TensorsLabAPIError("Insufficient credits. Please top up at https://tensorslab.tensorslab.com/")
-            else:
-                raise TensorsLabAPIError(f"{error_msg} (Code: {error_code})")
+
+        error_msg = result.get("msg", "Unknown error")
+        error_code = result.get("code")
+        if error_code == 9000:
+            raise TensorsLabAPIError("Insufficient credits. Please top up at https://tensorslab.tensorslab.com/")
+        raise TensorsLabAPIError(f"{error_msg} (Code: {error_code})")
 
     except TensorsLabAPIError:
         raise
@@ -241,9 +240,8 @@ def query_task_status(task_id: str, api_key: Optional[str] = None, more_info: bo
     endpoint = f"{BASE_URL}/v1/video/infobytaskid"
 
     try:
-        response = requests.post(
-            endpoint,
-            headers=headers,
+        response = _SESSION.post(
+            endpoint, headers=headers,
             json={"taskid": task_id, "moreTaskInfo": more_info},
             timeout=30
         )
@@ -256,9 +254,9 @@ def query_task_status(task_id: str, api_key: Optional[str] = None, more_info: bo
 
         if result.get("code") == 1000:
             return result.get("data", {})
-        else:
-            logger.error(f"❌ Error querying task: {result.get('msg', 'Unknown error')}")
-            return None
+
+        logger.error(f"❌ Error querying task: {result.get('msg', 'Unknown error')}")
+        return None
 
     except requests.exceptions.RequestException as e:
         logger.error(f"❌ Error querying task status: {e}")

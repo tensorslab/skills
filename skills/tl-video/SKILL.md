@@ -14,8 +14,8 @@ This skill enables AI-powered video generation through TensorsLab's API, support
 Before any video generation, verify the API key is configured:
 
 ```bash
-# Check if API key is set
-echo $TENSORSLAB_API_KEY
+# 仅检查变量是否存在，不输出完整值
+[ -n "$TENSORSLAB_API_KEY" ] && echo "✅ API key is set" || echo "❌ TENSORSLAB_API_KEY is not set"
 ```
 
 If not set, display this friendly message:
@@ -118,6 +118,11 @@ Video generation takes **several minutes**. Keep users informed:
 **Heartbeat interval:** Print encouraging message every 60 seconds.
 
 ## Using the Script
+
+> **依赖**：脚本需要 `requests` 库，首次使用前执行：
+> ```bash
+> pip install requests
+> ```
 
 Execute the Python script directly:
 

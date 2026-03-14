@@ -14,8 +14,8 @@ This skill enables AI-powered image generation through TensorsLab's API, support
 Before any image generation, verify the API key is configured:
 
 ```bash
-# Check if API key is set
-echo $TENSORSLAB_API_KEY
+# 仅检查变量是否存在，不输出完整值
+[ -n "$TENSORSLAB_API_KEY" ] && echo "✅ API key is set" || echo "❌ TENSORSLAB_API_KEY is not set"
 ```
 
 If not set, display this friendly message:
@@ -111,6 +111,11 @@ Supported formats:
 
 
 ## Using the Script
+
+> **依赖**：脚本需要 `requests` 库，首次使用前执行：
+> ```bash
+> pip install requests
+> ```
 
 Execute the Python script directly:
 

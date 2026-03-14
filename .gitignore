@@ -6,3 +6,4 @@ api-reference
 *.mp4
 *.webm
 *.zip
+.claude/settings.local.json

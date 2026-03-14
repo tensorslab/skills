@@ -7,16 +7,11 @@ Supports text-to-image and image-to-image generation using TensorsLab's models.
 
 import os
 import sys
-
-# Disable proxy for TensorsLab API to avoid SSL renegotiation issues
-# Must be done before importing requests
-for proxy_var in ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY']:
-    os.environ.pop(proxy_var, None)
-
 import time
 import json
 import argparse
 import logging
+import mimetypes
 from pathlib import Path
 from urllib.parse import urlparse
 from typing import Optional, List
@@ -27,6 +22,10 @@ except ImportError:
     logger = logging.getLogger(__name__)
     logger.error("Error: requests module is required. Install with: pip install requests")
     sys.exit(1)
+
+# 禁用代理仅限当前 session，不影响进程级环境变量
+_SESSION = requests.Session()
+_SESSION.proxies = {"http": "", "https": ""}
 
 
 class TensorsLabAPIError(Exception):
@@ -79,24 +78,21 @@ def ensure_output_dir(output_dir: Path):
 
 def download_image(url: str, output_path: Path) -> Path:
     """Download an image from URL to local path."""
-    import mimetypes
     try:
-        response = requests.get(url, timeout=30)
+        response = _SESSION.get(url, timeout=30)
         response.raise_for_status()
-        
-        # 获取真实的Content-Type扩展名
+
         content_type = response.headers.get('content-type', '').split(';')[0].strip()
         ext = mimetypes.guess_extension(content_type)
         if ext == '.jpe':
             ext = '.jpg'
-            
+
         if not ext:
-            url_path = urlparse(url).path
-            ext = Path(url_path).suffix
-            
+            ext = Path(urlparse(url).path).suffix
+
         if not ext or len(ext) > 6:
             ext = '.png'
-            
+
         final_path = output_path.with_suffix(ext)
         with open(final_path, 'wb') as f:
             f.write(response.content)
@@ -171,14 +167,8 @@ def generate_image(
         logger.info(f"🎨 Generating image using {model}...")
         logger.info(f"📝 Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
 
-        response = requests.post(
-            endpoint,
-            headers=headers,
-            files=files,
-            timeout=60
-        )
+        response = _SESSION.post(endpoint, headers=headers, files=files, timeout=60)
 
-        # Close any opened files
         for f in opened_files:
             f.close()
         logger.debug(f"API Response ({response.status_code}): {response.text}")
@@ -197,8 +187,7 @@ def generate_image(
             error_code = result.get("code")
             if error_code == 9000:
                 raise TensorsLabAPIError("Insufficient credits. Please top up at https://tensorslab.tensorslab.com/")
-            else:
-                raise TensorsLabAPIError(f"{error_msg} (Code: {error_code})")
+            raise TensorsLabAPIError(f"{error_msg} (Code: {error_code})")
 
     except TensorsLabAPIError:
         raise
@@ -228,12 +217,7 @@ def query_task_status(task_id: str, api_key: Optional[str] = None) -> dict:
     endpoint = f"{BASE_URL}/v1/images/infobytaskid"
 
     try:
-        response = requests.post(
-            endpoint,
-            headers=headers,
-            json={"taskid": task_id},
-            timeout=30
-        )
+        response = _SESSION.post(endpoint, headers=headers, json={"taskid": task_id}, timeout=30)
 
         try:
             result = response.json()
@@ -243,9 +227,9 @@ def query_task_status(task_id: str, api_key: Optional[str] = None) -> dict:
 
         if result.get("code") == 1000:
             return result.get("data", {})
-        else:
-            logger.error(f"❌ Error querying task: {result.get('msg', 'Unknown error')}")
-            return None
+
+        logger.error(f"❌ Error querying task: {result.get('msg', 'Unknown error')}")
+        return None
 
     except Exception as e:
         logger.error(f"❌ Error querying task status: {e}")
