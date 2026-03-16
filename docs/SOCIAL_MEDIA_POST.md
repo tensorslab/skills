@@ -236,7 +236,7 @@ image-generation, text-to-image, image-to-image, avatar, watermark-removal, obje
 
 **仓库 URL:** https://github.com/miyakooy/vison-skills
 
-**Homepage:** https://tensorslab.tensorslab.com/
+**Homepage:** https://www.tensorslab.com/
 
 **安装命令:**
 ```bash

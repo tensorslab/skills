@@ -194,9 +194,9 @@ MIT License - 详见 [LICENSE](./LICENSE)
 
 ## 📮 联系方式
 
-- 🌐 官网: https://tensorslab.tensorslab.com/
+- 🌐 官网: https://www.tensorslab.com/
 - 💬 GitHub: https://github.com/miyakooy/vison-skills
-- 📧 邮箱: support@tensorslab.com
+- 📧 邮箱: mia@tensorslab.com
 - 🐛 问题反馈: https://github.com/miyakooy/vison-skills/issues
 
 ## 🔐 安全
@@ -416,9 +416,9 @@ MIT License - see [LICENSE](./LICENSE)
 
 ## 📮 Contact
 
-- 🌐 Website: https://tensorslab.tensorslab.com/
+- 🌐 Website: https://www.tensorslab.com/
 - 💬 GitHub: https://github.com/miyakooy/vison-skills
-- 📧 Email: support@tensorslab.com
+- 📧 Email: mia@tensorslab.com
 - 🐛 Issue Tracker: https://github.com/miyakooy/vison-skills/issues
 
 ## 🔐 Security
