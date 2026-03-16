@@ -1,174 +1,113 @@
----
-name: tensorslab-image
-description: "Generate and edit images using TensorsLab's AI models. Supports text-to-image, image-to-image generation, plus advanced editing: avatar generation, watermark removal, object erasure, face replacement, and general image editing. Features automatic prompt enhancement, progress tracking, and local file saving. Requires TENSORSLAB_API_KEY environment variable."
----
+# TensorsLab AI Image Skills
 
-# TensorsLab Image Generation
+使用 TensorsLab 的 AI 模型生成和编辑图像。支持文生图、图生图、头像生成、水印去除、物体擦除、人脸替换等功能。
 
-## Overview
+## 功能范围
 
-This skill enables AI-powered image generation through TensorsLab's API, supporting both text-to-image and image-to-image workflows. The agent enhances user prompts with detailed visual descriptions before calling the API, ensuring high-quality outputs.
+### 核心功能
+- **文生图** (Text-to-Image): 从文本描述生成高质量图像
+- **图生图** (Image-to-Image): 基于参考图像生成新图像
+- **多图合成**: 合并多张图片并进行风格化渲染
 
-## Authentication Check
+### 高级图像编辑
+- **头像生成**: 生成二次元、写实、商务、卡通等风格头像
+- **水印去除**: 智能去除图片水印，保留背景纹理和视觉完整性
+- **物体擦除**: 擦除图片中不需要的物体，智能填充背景
+- **人脸替换**: 将一张图片的人脸自然替换到另一张图片
+- **通用编辑**: 修改图片颜色、添加物体、改变风格等
 
-Before any image generation, verify the API key is configured:
+## 使用场景
 
-```bash
-# 仅检查变量是否存在，不输出完整值
-[ -n "$TENSORSLAB_API_KEY" ] && echo "✅ API key is set" || echo "❌ TENSORSLAB_API_KEY is not set"
-```
+当用户需要以下功能时使用此技能：
 
-If not set, display this friendly message:
+### 图像生成
+- 生成产品宣传图像
+- 创建营销素材和海报
+- 生成头像（二次元、商务、写实等）
+- 生成概念设计和艺术创作
+- 文本描述转图像
 
-```
-您好！要生成高质量的内容，您需要先进行简单的配置：
-1. 访问 https://tensorai.tensorslab.com/ 登录并订阅。
-2. 在控制台中获取您的专属 API Key。
-3. 将其保存为环境变量：
-   - Windows (PowerShell): $env:TENSORSLAB_API_KEY="您的Key"
-   - Mac/Linux: export TENSORSLAB_API_KEY="您的Key"
-```
+### 图像编辑
+- 去除图片水印或 Logo
+- 擦除图片中不需要的物体或路人
+- 人脸替换和美化
+- 修改图片背景、颜色、风格
+- 添加或修改图片元素
 
-## Models
+### 图像优化
+- 图片风格转换
+- 背景替换
+- 图像合成和融合
 
-| Model | Description | Best For |
-|-------|-------------|----------|
-| **seedreamv45** | Latest enhanced model | General purpose, highest quality |
-| **seedreamv4** | Standard model | Fast generation, good quality |
-| **zimage** | Alternative model | Specific artistic styles |
+## 环境要求
 
-Default: `seedreamv4`
-
-## Workflow
-
-For additional scenarios beyond basic generation (avatar generation, watermark removal, object erasure, face replacement), see [references/scenarios.md](references/scenarios.md).
-
-### 1. Text-to-Image Generation
-
-User request: "画一个在月球上吃热狗的宇航员"
-
-**Agent processing:**
-1. Extract the core subject and action
-2. Enhance prompt with details (lighting, composition, style, atmosphere)
-3. Call API with enriched prompt
-4. Monitor progress with heartbeat updates
-5. Download to `./tensorslab_output/`
-
-**Example enhanced prompt:**
-```
-An astronaut sitting on the lunar surface, eating a hot dog with mustard,
-cinematic lighting, Earth visible in the background, highly detailed,
-photorealistic, 8k quality, dramatic shadows from the low sun angle
-```
-
-### 2. Image-to-Image Generation
-
-User request: "把 cat.png 的背景换成太空" or "参考 sketch.png 渲染成 3D 模型"
-
-**Agent processing:**
-1. Extract image file paths (absolute or relative to current directory)
-2. Enhance prompt with transformation instructions
-3. Upload source images with prompt
-4. Monitor and download results
-
-**Parameters for image-to-image:**
-- `sourceImage`: Array of image files (for local upload)
-- `imageUrl`: URL of source image
-- `prompt`: Description of desired transformation
-
-### 3. Image Editing (General Purpose)
-
-General-purpose editing for any local image modifications.
-
-**User request examples:**
-- "把这张图的天空改成日落色"
-- "给人物加上墨镜"
-- "把头发颜色染成粉色"
-
-**Agent processing:**
-1. Extract image file path
-2. Parse the specific editing instruction (what to change, where)
-3. Build enhanced prompt with precise editing guidance
-4. Call API with source image and editing prompt
-5. Save result to `./tensorslab_output/`
-
-**Example enhanced prompt:**
-```
-Change the sky to sunset colors with warm orange and pink gradients,
-matching the existing lighting conditions and atmospheric perspective,
-seamless blend at the horizon line
-```
-
-For avatar generation, watermark removal, object erasure, and face replacement scenarios, see [references/scenarios.md](references/scenarios.md).
-
-### 4. Resolution Options
-
-Supported formats:
-- **Aspect ratios**: `9:16`, `16:9`, `3:4`, `4:3`, `1:1`, `2:3`, `3:2`
-- **Resolution levels**: `2K`, `4K`
-- **Specific dimensions**: `WxH` format (e.g., `2048x2048`, `1920x1080`)
-  - Constraint: Total pixels must be between 3,686,400 and 16,777,216
-
-
-## Using the Script
-
-> **依赖**：脚本需要 `requests` 库，首次使用前执行：
-> ```bash
-> pip install requests
-> ```
-
-Execute the Python script directly:
+需要配置环境变量：
 
 ```bash
-# Text-to-image
-python scripts/tensorslab_image.py "a cat on the moon"
-
-# With specific resolution
-python scripts/tensorslab_image.py "sunset over mountains" --resolution 16:9
-
-# Image-to-image
-python scripts/tensorslab_image.py "watercolor style" --source cat.png
-
-# Specify model
-python scripts/tensorslab_image.py "cyberpunk city" --model seedreamv45
-
-# Custom output directory
-python scripts/tensorslab_image.py "a beautiful landscape" --output-dir ./my_images
+export TENSORSLAB_API_KEY=your_api_key_here
 ```
 
-## Task Status Flow
+**获取 API Key：**
+1. 访问 https://tensorslab.tensorslab.com/ 登录并订阅
+2. 在控制台获取专属 API Key
+3. 设置为环境变量（Windows/Mac/Linux 均支持）
 
-| Status | Code | Meaning |
-|--------|------|---------|
-| Queued | 1 | Task waiting in queue |
-| Processing | 2 | Currently generating |
-| Completed | 3 | Done, images ready |
-| Failed | 4 | Error occurred |
+## 工具调用
 
-## Error Handling
+此技能提供以下工具：
+- `tensorslab-image`: 图像生成和编辑（支持所有图像功能）
 
-Translate API errors to user-friendly messages:
+## 使用示例
 
-| Error Code | Meaning | User Message |
-|------------|---------|--------------|
-| 9000 | Insufficient credits | "亲，积分用完啦，请前往 https://tensorai.tensorslab.com"/ 充值" |
-| 9999 | General error | Show the specific error message |
-
-## Output
-
-All images are saved to output directory with naming pattern:
-- Default: `./tensorslab_output/` (current working directory)
-- Custom: Use `--output-dir` or `-o` to specify a different path
-- Naming: `{task_id}_{index}.{ext}` - e.g., `abcd_1234567890_0.png`
-
-After completion, inform user:
+### 文生图
 ```
-🎉 您的图片处理完毕！已存放于 ./tensorslab_output/{filename}
+画一个在月球上吃热狗的宇航员
+生成一张赛博朋克风格的未来城市图像
 ```
 
-## Resources
+### 图生图
+```
+把 ./cat.png 的背景换成太空
+参考 ./sketch.png 渲染成 3D 模型
+```
 
-- **scripts/tensorslab_image.py**: Main API client with full CLI support
-- **references/api_reference.md**: Detailed API documentation
-- **references/scenarios.md**: Advanced usage scenarios (avatar generation, watermark removal, object erasure, face replacement)
+### 头像生成
+```
+帮我生成一个二次元风格的头像
+生成一个专业的商务头像
+```
 
+### 图像编辑
+```
+把这张图的天空改成日落色
+给人物加上墨镜
+把头发颜色染成粉色
+```
+
+### 高级编辑
+```
+帮我去掉 ./image.jpg 的水印
+把 ./photo.jpg 里多余的路人擦掉
+把 ./face.jpg 的人脸换到 ./target.jpg 上
+```
+
+## 输出路径
+
+所有生成的图像会自动保存到 `./tensorslab_output/` 目录，支持多种格式（PNG、JPG、WEBP 等）。
+
+## 注意事项
+
+- 建议提供清晰具体的提示词以获得更好效果
+- 支持自动提示词优化和扩写
+- 图像生成通常需要几秒到几十秒
+- 支持多种尺寸和格式配置
+- 错误提示友好，失败时会给出明确的解决建议
+
+## OpenClaw 集成
+
+此技能已针对 OpenClaw 优化，支持：
+- 自动检测环境变量配置
+- 友好的错误提示和引导
+- 终端实时进度反馈
+- 本地文件自动保存
+- 自然的命令行交互体验

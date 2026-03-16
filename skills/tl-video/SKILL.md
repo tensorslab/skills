@@ -1,194 +1,136 @@
----
-name: tensorslab-video
-description: Generate videos using TensorsLab's AI video generation models. Supports text-to-video and image-to-video generation with automatic prompt enhancement, progress tracking, and local file saving. Use for generating videos from text descriptions, animating static images, creating cinematic content, and various aspect ratios. Requires TENSORSLAB_API_KEY environment variable. Video generation takes several minutes.
----
+# TensorsLab AI Video Skills
 
-# TensorsLab Video Generation
+使用 TensorsLab 的 AI 模型生成视频。支持文生视频、图生视频，提供电影级质量的视频内容生成能力。
 
-## Overview
+## 功能范围
 
-This skill enables AI-powered video generation through TensorsLab's API, supporting both text-to-video and image-to-video workflows. Video generation is a time-intensive process - tasks typically take several minutes to complete.
+### 核心功能
+- **文生视频** (Text-to-Video): 从文本描述生成高质量视频
+- **图生视频** (Image-to-Video): 让静态图像动起来
+- **运镜控制**: 支持多种运镜方式（推拉摇移、跟拍、环绕等）
 
-## Authentication Check
+### 视频特性
+- **多种宽高比**: 16横屏、9竖屏、1正方形等
+- **时长控制**: 支持自定义视频长度（通常 5-30 秒）
+- **电影级质量**: 支持高清、超清等分辨率
+- **智能运镜**: 自动优化运镜描述和场景细节
 
-Before any video generation, verify the API key is configured:
+## 使用场景
 
-```bash
-# 仅检查变量是否存在，不输出完整值
-[ -n "$TENSORSLAB_API_KEY" ] && echo "✅ API key is set" || echo "❌ TENSORSLAB_API_KEY is not set"
-```
+当用户需要以下功能时使用此技能：
 
-If not set, display this friendly message:
+### 视频生成
+- 生成产品宣传视频
+- 创建营销视频和广告片
+- 生成社交媒体短视频（抖音、TikTok、Reels 等）
+- 文本描述转视频
+- 制作动画和特效视频
 
-```
-您好！要生成高质量的内容，您需要先进行简单的配置：
-1. 访问 https://tensorslab.tensorslab.com/ 登录并订阅。
-2. 在控制台中获取您的专属 API Key。
-3. 将其保存为环境变量：
-   - Windows (PowerShell): $env:TENSORSLAB_API_KEY="您的Key"
-   - Mac/Linux: export TENSORSLAB_API_KEY="您的Key"
-```
+### 图像动效
+- 让静态照片动起来
+- 创建幻灯片转场视频
+- 图片序列转视频
+- 人像动画化
 
-## Models
+### 创作场景
+- 生成科幻、奇幻等题材视频
+- 制作音乐视频背景
+- 创建预告片和片头
 
-| Model | Description | Best For | Max Duration |
-|-------|-------------|----------|--------------|
-| **seedancev2** | Latest, highest quality | General purpose, cinematic content | 15s |
-| **seedancev15pro** | Pro quality | High-end productions | 10s |
-| **seedancev1profast** | Fast generation | Quick previews | 10s |
-| **seedancev1** | Standard lite | Basic videos | 10s |
+## 环境要求
 
-Default: `seedancev1profast`
-
-## Workflow
-
-### 1. Text-to-Video Generation
-
-User request: "做一段 10 秒钟横屏的宇宙飞船穿梭星际的视频"
-
-**Agent processing:**
-1. Extract parameters: `duration=10`, `ratio="16:9"`
-2. Enhance prompt with cinematic details, camera movements, scene descriptions
-3. Call API with enriched prompt
-4. Monitor progress with heartbeat updates (every 60 seconds)
-5. Download to `./tensorslab_output/`
-
-**Example enhanced prompt:**
-```
-Cinematic wide shot of a spaceship rapidly flying through space, passing glowing
-nebulae and distant stars, lens flares, dramatic camera movement, epic scale,
-movie-quality visual effects, smooth 24fps motion
-```
-
-### 2. Image-to-Video Generation
-
-User request: "让这张人物合影 family.jpg 动起来" or "让风景照动起来"
-
-**Agent processing:**
-1. Extract image file paths (1-2 images supported)
-2. Enhance prompt with motion instructions
-3. Monitor progress with heartbeat updates
-4. Download results
-
-**Parameters for image-to-video:**
-- `sourceImage`: Array of image files (1-2 images max)
-- `imageUrl`: Comma-separated URLs of source images
-- `prompt`: Description of desired motion/animation
-
-### 3. Resolution and Aspect Ratio
-
-**Aspect ratios:**
-- `9:16` - Vertical (TikTok, Reels, Shorts) - **default**
-- `16:9` - Horizontal (YouTube, standard video)
-- Other ratios available depending on model
-
-**Resolutions:**
-- `480p` - SD quality, faster generation
-- `720p` - HD quality - **default**
-- `1080p` - Full HD
-- `1440p` - 2K quality (seedancev2 only)
-
-### 4. Duration Options
-
-- **seedancev2**: 5-15 seconds
-- **Other models**: 5-10 seconds
-
-Longer videos take proportionally more time to generate.
-
-### 5. Special Features (seedancev2 only)
-
-| Feature | Parameter | Description |
-|---------|-----------|-------------|
-| Audio Generation | `generate_audio=1` | Generate soundtrack with video |
-| Last Frame | `return_last_frame=1` | Also return final frame as image |
-
-## Progress Tracking
-
-Video generation takes **several minutes**. Keep users informed:
-
-```
-⏳ Waiting for video generation to complete...
-   (This may take several minutes - please be patient)
-🔄 Status: Processing (elapsed: 45s)
-🚀 正在渲染电影级大片，已耗时 60 秒，请稍安勿躁...
-🚀 正在渲染电影级大片，已耗时 120 秒，请稍安勿躁...
-✅ Task completed!
-```
-
-**Heartbeat interval:** Print encouraging message every 60 seconds.
-
-## Using the Script
-
-> **依赖**：脚本需要 `requests` 库，首次使用前执行：
-> ```bash
-> pip install requests
-> ```
-
-Execute the Python script directly:
+需要配置环境变量：
 
 ```bash
-# Text-to-video (default 5s, vertical 9:16)
-python scripts/tensorslab_video.py "a spaceship flying through space"
-
-# 10 second horizontal video
-python scripts/tensorslab_video.py "sunset over ocean waves" --duration 10 --ratio 16:9
-
-# Image-to-video
-python scripts/tensorslab_video.py "make this photo come alive" --source portrait.jpg
-
-# Fast preview
-python scripts/tensorslab_video.py "abstract flowing colors" --model seedancev1profast
-
-# High quality with audio
-python scripts/tensorslab_video.py "epic mountain timelapse" --resolution 1440p --duration 10 --audio
-
-# Custom output directory
-python scripts/tensorslab_video.py "a sunset timelapse" --output-dir ./my_videos
+export TENSORSLAB_API_KEY=your_api_key_here
 ```
 
-## Task Status Flow
+**获取 API Key：**
+1. 访问 https://tensorslab.tensorslab.com/ 登录并订阅
+2. 在控制台获取专属 API Key
+3. 设置为环境变量（Windows/Mac/Linux 均支持）
 
-| Status | Code | Meaning |
-|--------|------|---------|
-| Pending | 1 | Task waiting in queue |
-| Processing | 2 | Currently generating |
-| Completed | 3 | Done, video ready |
-| Failed | 4 | Error occurred |
-| Uploading | 5 | Uploading generated video |
+## 工具调用
 
-## Error Handling
+此技能提供以下工具：
+- `tensorslab-video`: 视频生成（支持文生视频、图生视频）
 
-Translate API errors to user-friendly messages:
+## 使用示例
 
-| Error Code | Meaning | User Message |
-|------------|---------|--------------|
-| 9000 | Insufficient credits | "亲，积分用完啦，请前往 https://tensorslab.tensorslab.com/ 充值" |
-| 9999 | General error | Show the specific error message |
-
-## Output
-
-All videos are saved to output directory with naming pattern:
-- Default: `./tensorslab_output/` (current working directory)
-- Custom: Use `--output-dir` or `-o` to specify a different path
-- Naming: `{task_id}_{index}.mp4` - e.g., `abcd_1234567890_0.mp4`
-
-After completion, inform user:
+### 文生视频
 ```
-🎉 您的视频处理完毕！已存放于 ./tensorslab_output/{filename}
+做一段 10 秒钟横屏的宇宙飞船穿梭星际的视频
+生成 15 秒竖屏的城市夜景延时摄影
+制作一段 20 秒的樱花飘落的唯美视频
 ```
 
-## Tips for Better Results
+### 图生视频
+```
+让这张人物合影 ./family.jpg 动起来
+把 ./landscape.png 转换成一段 10 秒的视频
+让这张静态照片 ./portrait.jpg 添加微动效果
+```
 
-### Text-to-Video
-- Include cinematic terms: "wide shot", "close-up", "pan", "dolly"
-- Describe motion: "flying rapidly", "slowly drifting", "zooming in"
-- Specify style: "cinematic", "documentary style", "dreamy"
+### 运镜控制
+```
+生成一段无人机环绕拍摄的视频
+制作一段推镜头逐渐走近的视频
+创建一段跟拍视角的城市行走视频
+```
 
-### Image-to-Video
-- Describe the desired motion: "gentle sway", "subtle movement"
-- For landscapes: "clouds moving", "water flowing", "leaves rustling"
+## 视频参数
 
-## Resources
+### 宽高比
+- `16:9` - 横屏（适用于 YouTube、电脑播放）
+- `9:16` - 竖屏（适用于手机、抖音、TikTok）
+- `1:1` - 正方形（适用于 Instagram）
+- `4:3` - 传统电视比例
 
-- **scripts/tensorslab_video.py**: Main API client with full CLI support
-- **references/api_reference.md**: Detailed API documentation
+### 时长
+- 短视频: 5-10 秒
+- 中等视频: 10-20 秒
+- 长视频: 20-30 秒
+
+### 运镜类型
+- 推镜头 (Dolly In): 逐渐靠近主体
+- 拉镜头 (Dolly Out): 逐渐远离主体
+- 摇镜头 (Pan): 左右移动视角
+- 移镜头 (Truck): 左右平移
+- 跟拍: 跟随主体移动
+- 环绕: 环绕主体拍摄
+
+## 输出路径
+
+所有生成的视频会自动保存到 `./tensorslab_output/` 目录，支持 MP4、WEBM 等格式。
+
+## 进度反馈
+
+视频生成通常需要几分钟时间，脚本会显示实时进度：
+- 🚀 正在渲染视频，已耗时 XX 秒
+- 📊 当前进度: XX%
+- ⏳ 预计剩余时间: XX 秒
+
+## 注意事项
+
+- 视频生成需要较长时间（通常 2-10 分钟），请耐心等待
+- 建议提供详细的场景描述和运镜要求
+- 支持自动提示词优化和扩写
+- 错误提示友好，失败时会给出明确的解决建议
+- 支持中断和恢复生成
+
+## OpenClaw 集成
+
+此技能已针对 OpenClaw 优化，支持：
+- 自动检测环境变量配置
+- 友好的错误提示和引导
+- 终端实时进度反馈（消除等待焦虑）
+- 本地文件自动保存
+- 自然的命令行交互体验
+- 智能失败降级（积分不足、尺寸不符等错误转友好提示）
+
+## 常见错误处理
+
+- **积分不足**: 提示用户前往充值
+- **尺寸不支持**: 建议修改参数
+- **生成超时**: 提供重试或调整方案
+- **网络错误**: 提示检查网络连接
