@@ -1,0 +1,100 @@
+{
+  "name": "@tensorlab/openclaw-skills",
+  "version": "1.0.0",
+  "description": "OpenClaw 集成 TensorsLab AI 模型，提供强大的图像和视频生成能力。支持文生图、图生图、头像生成、水印去除、物体擦除、人脸替换、文生视频、图生视频等全套功能。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "openclaw",
+    "claw",
+    "tensorlab",
+    "tensorslab",
+    "ai",
+    "image-generation",
+    "video-generation",
+    "text-to-image",
+    "text-to-video",
+    "image-to-video",
+    "avatar",
+    "watermark-removal",
+    "face-replacement",
+    "object-erasure",
+    "image-editing",
+    "multimedia",
+    "creative-tools",
+    "换装",
+    "换脸",
+    "头像",
+    "图片",
+    "图像",
+    "p图",
+    "修图",
+    "去水印",
+    "换衣服",
+    "人像",
+    "照片",
+    "生成图片",
+    "画图",
+    "绘画",
+    "创意",
+    "设计",
+    "视频",
+    "短视频",
+    "制作视频",
+    "生成视频",
+    "动画",
+    "电影",
+    "运镜"
+  ],
+  "author": {
+    "name": "TensorsLab",
+    "email": "support@tensorslab.com",
+    "url": "https://tensorslab.tensorslab.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/miyakooy/vison-skills#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miyakooy/vison-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/miyakooy/vison-skills/issues"
+  },
+  "openclaw": {
+    "type": "skills",
+    "version": "1.0.0",
+    "compatible": true,
+    "priority": "high",
+    "categories": [
+      "ai-generation",
+      "image-processing",
+      "video-generation",
+      "multimedia",
+      "creative-tools"
+    ],
+    "skills": [
+      {
+        "name": "tensorslab-image",
+        "type": "tool",
+        "description": "图像生成和编辑技能",
+        "entry": "skills/tl-image"
+      },
+      {
+        "name": "tensorslab-video",
+        "type": "tool",
+        "description": "视频生成技能",
+        "entry": "skills/tl-video"
+      }
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ]
+}

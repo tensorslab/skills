@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main, openclaw-vision-skills]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linter
+        run: npm run lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+  validate-skills:
+    name: Validate Skills
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate SKILL.md files
+        run: |
+          echo "Validating SKILL.md files..."
+          for skill in skills/*/SKILL.md; do
+            if [ -f "$skill" ]; then
+              echo "✓ $skill exists"
+            else
+              echo "✗ $skill not found"
+              exit 1
+            fi
+          done
+
+      - name: Validate marketplace.json
+        run: |
+          echo "Validating marketplace.json..."
+          if [ -f ".claude-plugin-plugin/marketplace.json" ]; then
+            echo "✓ marketplace.json is valid"
+          else
+            echo "✗ marketplace.json not found"
+            exit 1
+          fi
