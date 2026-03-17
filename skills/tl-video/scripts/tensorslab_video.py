@@ -23,6 +23,9 @@ except ImportError:
     import sys as _sys
     _sys.exit(1)
 
+# Import the shared auth module
+from tensorslab_auth import get_or_authorize_api_key, API_BASE_URL, DEFAULT_OUTPUT_DIR
+
 # 禁用代理仅限当前 session，不影响进程级环境变量
 _SESSION = requests.Session()
 _SESSION.proxies = {"http": "", "https": ""}
@@ -35,9 +38,6 @@ class TensorsLabAPIError(Exception):
 
 logger = logging.getLogger(__name__)
 
-# API Configuration
-BASE_URL = "https://api.tensorslab.com"
-DEFAULT_OUTPUT_DIR = Path(".") / "tensorslab_output"
 
 # Task status codes
 TASK_STATUS = {
@@ -56,20 +56,19 @@ RESPONSE_CODES = {
 }
 
 
-def get_api_key() -> str:
-    """Get API key from environment variable."""
-    api_key = os.environ.get("TENSORSLAB_API_KEY")
-    if not api_key:
-        raise TensorsLabAPIError(
-            "TENSORSLAB_API_KEY environment variable is not set.\n"
-            "To get your API key:\n"
-            "1. Visit https://tensorai.tensorslab.com/ and subscribe\n"
-            "2. Get your API Key from the console\n"
-            "3. Set the environment variable:\n"
-            "   - Windows (PowerShell): $env:TENSORSLAB_API_KEY=\"your-key-here\"\n"
-            "   - Mac/Linux: export TENSORSLAB_API_KEY=\"your-key-here\""
-        )
-    return api_key
+def get_api_key(key_name: str = "video_skill") -> str:
+    """
+    Get API key from environment variable or trigger authorization flow.
+
+    This function will:
+    1. Check TENSORSLAB_API_KEY environment variable
+    2. Check ~/.tensorslab/.env file
+    3. If not found, trigger browser-based authorization flow
+
+    Returns:
+        The API key.
+    """
+    return get_or_authorize_api_key(key_name=key_name)
 
 
 def ensure_output_dir(output_dir: Path):
@@ -175,13 +174,13 @@ def generate_video(
 
     # Determine endpoint
     endpoint_map = {
-        "seedancev1": f"{BASE_URL}/v1/video/seedancev1",
-        "seedancev15pro": f"{BASE_URL}/v1/video/seedancev15pro",
-        "seedancev1profast": f"{BASE_URL}/v1/video/seedancev1profast",
-        "seedancev2": f"{BASE_URL}/v1/video/seedancev2",
+        "seedancev1": f"{API_BASE_URL}/v1/video/seedancev1",
+        "seedancev15pro": f"{API_BASE_URL}/v1/video/seedancev15pro",
+        "seedancev1profast": f"{API_BASE_URL}/v1/video/seedancev1profast",
+        "seedancev2": f"{API_BASE_URL}/v1/video/seedancev2",
     }
 
-    endpoint = endpoint_map.get(model, f"{BASE_URL}/v1/video/seedancev2")
+    endpoint = endpoint_map.get(model, f"{API_BASE_URL}/v1/video/seedancev2")
 
     try:
         logger.info(f"🎬 Generating video using {model}...")
@@ -237,7 +236,7 @@ def query_task_status(task_id: str, api_key: Optional[str] = None, more_info: bo
         "Content-Type": "application/json"
     }
 
-    endpoint = f"{BASE_URL}/v1/video/infobytaskid"
+    endpoint = f"{API_BASE_URL}/v1/video/infobytaskid"
 
     try:
         response = _SESSION.post(

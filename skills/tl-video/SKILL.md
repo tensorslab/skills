@@ -11,23 +11,29 @@ This skill enables AI-powered video generation through TensorsLab's API, support
 
 ## Authentication Check
 
-Before any video generation, verify the API key is configured:
+Before any video generation, the skill will automatically verify the API key is configured.
+
+**Automatic Authorization Flow:**
+- If `TENSORSLAB_API_KEY` is not set, the skill will automatically:
+  1. Open a browser window for you to authorize
+  2. After authorization, the API key will be saved to `~/.tensorslab/.env`
+  3. The skill will then proceed with your request
+
+**Manual Setup (Optional):**
+If you prefer to set up the API key manually:
 
 ```bash
-# 仅检查变量是否存在，不输出完整值
-[ -n "$TENSORSLAB_API_KEY" ] && echo "✅ API key is set" || echo "❌ TENSORSLAB_API_KEY is not set"
+# Set environment variable directly
+# Windows (PowerShell): $env:TENSORSLAB_API_KEY="your-key-here"
+# Mac/Linux: export TENSORSLAB_API_KEY="your-key-here"
+
+# Or create/edit ~/.tensorslab/.env file:
+TENSORSLAB_API_KEY=your-key-here
 ```
 
-If not set, display this friendly message:
-
-```
-您好！要生成高质量的内容，您需要先进行简单的配置：
-1. 访问 https://tensorslab.tensorslab.com/ 登录并订阅。
-2. 在控制台中获取您的专属 API Key。
-3. 将其保存为环境变量：
-   - Windows (PowerShell): $env:TENSORSLAB_API_KEY="您的Key"
-   - Mac/Linux: export TENSORSLAB_API_KEY="您的Key"
-```
+To get your API key:
+1. Visit https://tensorslab.tensorslab.com/ and subscribe
+2. Get your API Key from the console
 
 ## Models
 
