@@ -1,6 +1,6 @@
 ---
-name: tensorslab-image
-description: "Generate and edit images using TensorsLab's AI models. Supports text-to-image, image-to-image generation, plus advanced editing: avatar generation, watermark removal, object erasure, face replacement, and general image editing. Features automatic prompt enhancement, progress tracking, and local file saving. Requires TENSORSLAB_API_KEY environment variable."
+name: tl-image
+description: "Generate and edit images using TensorsLab's AI models. Supports text-to-image, image-to-image generation, plus advanced editing: avatar generation, watermark removal, object erasure, face replacement, and general image editing. Features automatic prompt enhancement, progress tracking, and local file saving. Requires browser-based authorization before first use."
 ---
 
 # TensorsLab Image Generation
@@ -9,9 +9,9 @@ description: "Generate and edit images using TensorsLab's AI models. Supports te
 
 This skill enables AI-powered image generation through TensorsLab's API, supporting both text-to-image and image-to-image workflows. The agent enhances user prompts with detailed visual descriptions before calling the API, ensuring high-quality outputs.
 
-## Authentication Check
+## Authorization
 
-**BEFORE any image generation, check if API key exists. If not, run:**
+**BEFORE any image generation, you must authorize with TensorsLab. Run:**
 
 ```bash
 python scripts/tensorslab_auth.py
@@ -27,11 +27,13 @@ This will open a browser for authorization. Wait for "Authorization Successful!"
 
 **Show this complete URL to the user** so they can manually open it in a browser to complete authorization.
 
+After authorization, the API key is stored in `~/.tensorslab/.env` and you don't need to re-authorize unless the key expires.
+
 ## Models
 
 | Model | Description | Best For |
 |-------|-------------|----------|
-| **seedreamv45** | Latest enhanced model | General purpose, highest quality |
+| **seedreamv5** | Latest enhanced model | General purpose, highest quality |
 | **seedreamv4** | Standard model | Fast generation, good quality |
 | **zimage** | Alternative model | Specific artistic styles |
 | **quickedit** | Image instruction editing | Fast color/style/object editing |
@@ -111,9 +113,9 @@ Supported formats:
 
 ## Using the Script
 
-> **依赖**：脚本需要 `requests` 库，首次使用前执行：
+> **依赖**：脚本需要 `requests` 和 `pyyaml` 库，首次使用前执行：
 > ```bash
-> pip install requests
+> pip install requests pyyaml
 > ```
 
 Execute the Python script directly:
@@ -125,11 +127,14 @@ python scripts/tensorslab_image.py "a cat on the moon"
 # With specific resolution
 python scripts/tensorslab_image.py "sunset over mountains" --resolution 16:9
 
-# Image-to-image
+# Image-to-image with local file
 python scripts/tensorslab_image.py "watercolor style" --source cat.png
 
+# Image-to-image with URL
+python scripts/tensorslab_image.py "watercolor style" --image-url https://example.com/cat.jpg
+
 # Specify model
-python scripts/tensorslab_image.py "cyberpunk city" --model seedreamv45
+python scripts/tensorslab_image.py "cyberpunk city" --model seedreamv5
 
 # Custom output directory
 python scripts/tensorslab_image.py "a beautiful landscape" --output-dir ./my_images
@@ -162,6 +167,14 @@ All images are saved to output directory with naming pattern:
 - Default: `./tensorslab_output/` (current working directory)
 - Custom: Use `--output-dir` or `-o` to specify a different path
 - Naming: `{task_id}_{index}.{ext}` - e.g., `abcd_1234567890_0.png`
+
+**URL mapping**: The script also saves file-to-URL mappings in `./tensorslab_output/urls.yaml`. This file tracks the original URLs for each downloaded file and accumulates entries across multiple runs. When you need the original URL of a generated image, read this file.
+
+```yaml
+# Example urls.yaml content
+abcd_1234567890_0.png: https://tensorai.tensorslab.com/images/abcd_1234567890_0.png
+abcd_1234567890_1.png: https://tensorai.tensorslab.com/images/abcd_1234567890_1.png
+```
 
 After completion, inform user:
 ```

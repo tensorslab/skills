@@ -23,6 +23,13 @@ except ImportError:
     import sys as _sys
     _sys.exit(1)
 
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    logger.error("Error: pyyaml module is required. Install with: pip install pyyaml")
+    YAML_AVAILABLE = False
+
 # Import the shared auth module
 from tensorslab_auth import get_or_authorize_api_key, API_BASE_URL, DEFAULT_OUTPUT_DIR
 
@@ -100,6 +107,41 @@ def download_video(url: str, output_path: Path) -> bool:
     except Exception as e:
         logger.warning(f"\r⚠️ Failed to download video from {url}: {e}")
         return False
+
+
+def save_url_mapping(output_dir: Path, filename: str, url: str):
+    """
+    Save filename-to-URL mapping to urls.yaml.
+
+    Args:
+        output_dir: Output directory path
+        filename: Local filename
+        url: Original URL
+    """
+    if not YAML_AVAILABLE:
+        logger.debug("⚠️ yaml module not available, skipping URL mapping save")
+        return
+
+    urls_file = output_dir / "urls.yaml"
+
+    # Load existing mappings or create new
+    if urls_file.exists():
+        try:
+            with open(urls_file, 'r', encoding='utf-8') as f:
+                mappings = yaml.safe_load(f) or {}
+        except Exception:
+            mappings = {}
+    else:
+        mappings = {}
+
+    # Add new mapping (update if file already exists)
+    mappings[filename] = url
+
+    # Save back to file
+    with open(urls_file, 'w', encoding='utf-8') as f:
+        yaml.dump(mappings, f, allow_unicode=True, sort_keys=False)
+
+    logger.debug(f"💾 Saved URL mapping: {filename} -> {url}")
 
 
 def generate_video(
@@ -334,6 +376,8 @@ def wait_and_download(
                 logger.info(f"📥 Downloading video {i+1}/{len(urls)}: {output_path}")
                 if download_video(url, output_path):
                     downloaded_files.append(str(output_path))
+                    # Save URL mapping
+                    save_url_mapping(output_dir, filename, url)
 
             return downloaded_files
 

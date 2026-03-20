@@ -38,7 +38,7 @@ All responses follow this structure:
 
 ### 1. Generate Image (SeeDream V4.5)
 
-**Endpoint:** `POST /v1/images/seedreamv45`
+**Endpoint:** `POST /v1/images/seedreamv5`
 
 **Recommended for:** General purpose, highest quality output
 
@@ -46,7 +46,7 @@ All responses follow this structure:
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `category` | string | No | Default: "seedreamv45" |
+| `category` | string | No | Default: "seedreamv5" |
 | `prompt` | string | Yes | Text description of desired image |
 | `batchsize` | integer | No | Number of images (1-15), default: 1 |
 | `resolution` | string | No | Aspect ratio (9:16, 16:9, 3:4, 4:3, 1:1, 2:3, 3:2), level (2K, 4K), or WxH |
@@ -122,7 +122,7 @@ All responses follow this structure:
   "msg": "OK",
   "data": {
     "taskid": "abcd_1234567890abcdef",
-    "category": "seedreamv45",
+    "category": "seedreamv5",
     "starttime": "2026-01-30 12:00:00",
     "url": ["https://example.com/image.jpg"],
     "image_status": 3,

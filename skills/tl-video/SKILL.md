@@ -1,6 +1,6 @@
 ---
-name: tensorslab-video
-description: Generate videos using TensorsLab's AI video generation models. Supports text-to-video and image-to-video generation with automatic prompt enhancement, progress tracking, and local file saving. Use for generating videos from text descriptions, animating static images, creating cinematic content, and various aspect ratios. Requires TENSORSLAB_API_KEY environment variable. Video generation takes several minutes.
+name: tl-video
+description: Generate videos using TensorsLab's AI video generation models. Supports text-to-video and image-to-video generation with automatic prompt enhancement, progress tracking, and local file saving. Use for generating videos from text descriptions, animating static images, creating cinematic content, and various aspect ratios. Requires browser-based authorization before first use. Video generation takes several minutes.
 ---
 
 # TensorsLab Video Generation
@@ -9,9 +9,9 @@ description: Generate videos using TensorsLab's AI video generation models. Supp
 
 This skill enables AI-powered video generation through TensorsLab's API, supporting both text-to-video and image-to-video workflows. Video generation is a time-intensive process - tasks typically take several minutes to complete.
 
-## Authentication Check
+## Authorization
 
-**BEFORE any video generation, check if API key exists. If not, run:**
+**BEFORE any video generation, you must authorize with TensorsLab. Run:**
 
 ```bash
 python scripts/tensorslab_auth.py
@@ -26,6 +26,8 @@ This will open a browser for authorization. Wait for "Authorization Successful!"
 ```
 
 **Show this complete URL to the user** so they can manually open it in a browser to complete authorization.
+
+After authorization, the API key is stored in `~/.tensorslab/.env` and you don't need to re-authorize unless the key expires.
 
 ## Models
 
@@ -117,9 +119,9 @@ Video generation takes **several minutes**. Keep users informed:
 
 ## Using the Script
 
-> **依赖**：脚本需要 `requests` 库，首次使用前执行：
+> **依赖**：脚本需要 `requests` 和 `pyyaml` 库，首次使用前执行：
 > ```bash
-> pip install requests
+> pip install requests pyyaml
 > ```
 
 Execute the Python script directly:
@@ -131,8 +133,11 @@ python scripts/tensorslab_video.py "a spaceship flying through space"
 # 10 second horizontal video
 python scripts/tensorslab_video.py "sunset over ocean waves" --duration 10 --ratio 16:9
 
-# Image-to-video
+# Image-to-video with local file
 python scripts/tensorslab_video.py "make this photo come alive" --source portrait.jpg
+
+# Image-to-video with URL
+python scripts/tensorslab_video.py "make this photo come alive" --image-url https://example.com/portrait.jpg
 
 # Fast preview
 python scripts/tensorslab_video.py "abstract flowing colors" --model seedancev1profast
@@ -169,6 +174,13 @@ All videos are saved to output directory with naming pattern:
 - Default: `./tensorslab_output/` (current working directory)
 - Custom: Use `--output-dir` or `-o` to specify a different path
 - Naming: `{task_id}_{index}.mp4` - e.g., `abcd_1234567890_0.mp4`
+
+**URL mapping**: The script also saves file-to-URL mappings in `./tensorslab_output/urls.yaml`. This file tracks the original URLs for each downloaded file and accumulates entries across multiple runs. When you need the original URL of a generated video, read this file.
+
+```yaml
+# Example urls.yaml content
+abcd_1234567890_0.mp4: https://tensorai.tensorslab.com/videos/abcd_1234567890_0.mp4
+```
 
 After completion, inform user:
 ```

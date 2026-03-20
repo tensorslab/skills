@@ -12,6 +12,7 @@ import json
 import argparse
 import logging
 import mimetypes
+import yaml
 from pathlib import Path
 from urllib.parse import urlparse
 from typing import Optional, List
@@ -22,6 +23,13 @@ except ImportError:
     logger = logging.getLogger(__name__)
     logger.error("Error: requests module is required. Install with: pip install requests")
     sys.exit(1)
+
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    logger.error("Error: pyyaml module is required. Install with: pip install pyyaml")
+    YAML_AVAILABLE = False
 
 # Import the shared auth module
 from tensorslab_auth import get_or_authorize_api_key, API_BASE_URL, DEFAULT_OUTPUT_DIR
@@ -113,7 +121,7 @@ def generate_image(
 
     Args:
         prompt: Text prompt for image generation
-        model: Model to use (seedreamv4, seedreamv45, zimage, quickedit)
+        model: Model to use (seedreamv4, seedreamv5, zimage, quickedit)
         resolution: Image resolution (aspect ratio like "16:9", "1:1", or level like "2K", "4K", or WxH like "2048x2048")
         source_images: List of local image paths for image-to-image
         image_url: URL of source image for image-to-image
@@ -137,7 +145,7 @@ def generate_image(
     ]
 
     # Add model-specific parameters
-    if model in ["seedreamv4", "seedreamv45"]:
+    if model in ["seedreamv4", "seedreamv5"]:
         files.append(("category", (None, model)))
     elif model == "zimage":
         # Enable prompt extension
@@ -160,8 +168,8 @@ def generate_image(
         endpoint = f"{API_BASE_URL}/v1/images/seedreamv4"
     elif model == "quickedit":
         endpoint = f"{API_BASE_URL}/v1/images/quickedit"
-    else:  # seedreamv45 (default)
-        endpoint = f"{API_BASE_URL}/v1/images/seedreamv45"
+    else:  # seedreamv5 (default)
+        endpoint = f"{API_BASE_URL}/v1/images/seedreamv5"
 
     try:
         logger.info(f"🎨 Generating image using {model}...")
@@ -236,6 +244,41 @@ def query_task_status(task_id: str, api_key: Optional[str] = None) -> dict:
         return None
 
 
+def save_url_mapping(output_dir: Path, filename: str, url: str):
+    """
+    Save filename-to-URL mapping to urls.yaml.
+
+    Args:
+        output_dir: Output directory path
+        filename: Local filename
+        url: Original URL
+    """
+    if not YAML_AVAILABLE:
+        logger.debug("⚠️ yaml module not available, skipping URL mapping save")
+        return
+
+    urls_file = output_dir / "urls.yaml"
+
+    # Load existing mappings or create new
+    if urls_file.exists():
+        try:
+            with open(urls_file, 'r', encoding='utf-8') as f:
+                mappings = yaml.safe_load(f) or {}
+        except Exception:
+            mappings = {}
+    else:
+        mappings = {}
+
+    # Add new mapping (update if file already exists)
+    mappings[filename] = url
+
+    # Save back to file
+    with open(urls_file, 'w', encoding='utf-8') as f:
+        yaml.dump(mappings, f, allow_unicode=True, sort_keys=False)
+
+    logger.debug(f"💾 Saved URL mapping: {filename} -> {url}")
+
+
 def wait_and_download(
     task_id: str,
     api_key: Optional[str] = None,
@@ -296,6 +339,8 @@ def wait_and_download(
                 final_path = download_image(url, output_path)
                 if final_path:
                     downloaded_files.append(str(final_path))
+                    # Save URL mapping (use actual filename with extension)
+                    save_url_mapping(output_dir, final_path.name, url)
 
             return downloaded_files
 
@@ -321,12 +366,12 @@ Examples:
   python tensorslab_image.py "make this look like a watercolor painting" --source cat.png
 
   # Specify model and resolution
-  python tensorslab_image.py "a sunset over mountains" --model seedreamv45 --resolution 16:9
+  python tensorslab_image.py "a sunset over mountains" --model seedreamv5 --resolution 16:9
         """
     )
 
     parser.add_argument("prompt", help="Text prompt for image generation")
-    parser.add_argument("--model", "-m", choices=["seedreamv4", "seedreamv45", "zimage", "quickedit"],
+    parser.add_argument("--model", "-m", choices=["seedreamv4", "seedreamv5", "zimage", "quickedit"],
                        default="seedreamv4", help="Model to use (default: seedreamv4)")
     parser.add_argument("--resolution", "-r", default="2K",
                        help="Resolution: aspect ratio (9:16, 16:9, 1:1, etc.), level (2K, 4K), or WxH")
