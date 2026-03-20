@@ -1,24 +1,157 @@
 {
-  "name": "tensorslab-skills",
-  "owner": {
-    "name": "TensorsLab"
-  },
-  "metadata": {
-    "description": "Powerful Agent Skills for image and video generation tasks using TensorsLab. Support Text-to-Image, Image-to-Image, Text-to-Video and Image-to-Video via natural language prompt.",
-    "version": "1.0.0"
-  },
-  "plugins": [
+  "name": "TensorsLab AI Skills",
+  "version": "1.0.0",
+  "description": "OpenClaw 集成 TensorsLab AI 模型，提供强大的图像和视频生成能力。支持文生图、图生图、头像生成、水印去除、物体擦除、人脸替换、文生视频、图生视频等全套功能。自然语言交互，本地自动保存，极致用户体验。",
+  "author": "TensorsLab",
+  "homepage": "https://tensorslab.tensorslab.com",
+  "repository": "https://github.com/tensorslab/skills",
+  "license": "MIT",
+  "categories": [
+    "ai-generation",
+    "image-processing",
+    "video-generation",
+    "multimedia",
+    "creative-tools"
+  ],
+  "skills": [
     {
-      "name": "tl-image",
-      "source": "./skills/tl-image",
-      "skills": "./",
-      "description": "TensorsLab Image Generation Skill. Seamlessly generate high-quality images via Text-to-Image or edit/synthesize using Image-to-Image. Features intelligent prompt enrichment and automated local file delivery."
+      "name": "tensorslab-image",
+      "title": "TensorsLab 图像 AI",
+      "description": "使用 TensorsLab AI 生成和编辑图像。支持文生图、图生图、头像生成、水印去除、物体擦除、人脸替换等功能。自然语言交互，本地自动保存。",
+      "icon": "🎨",
+      "tags": [
+        "image-generation",
+        "text-to-image",
+        "image-to-image",
+        "avatar",
+        "watermark-removal",
+        "object-erasure",
+        "face-replacement",
+        "image-editing",
+        "ai-art",
+        "photo-editing",
+        "换装",
+        "换脸",
+        "头像",
+        "图片",
+        "图像",
+        "p图",
+        "修图",
+        "watermark",
+        "去水印",
+        "换衣服",
+        "人像",
+        "照片",
+        "生成图片",
+        "画图",
+        "绘画",
+        "创意",
+        "设计"
+      ],
+      "keywords": [
+        "图像生成",
+        "图片生成",
+        "文生图",
+        "图生图",
+        "头像生成",
+        "水印去除",
+        "去水印",
+        "物体擦除",
+        "人脸替换",
+        "换脸",
+        "图片编辑",
+        "图像编辑",
+        "p图",
+        "修图",
+        "换装",
+        "换衣服",
+        "AI画图",
+        "AI绘画",
+        "AI修图",
+        "艺术创作",
+        "照片处理",
+        "人像处理",
+        "tensorslab",
+        "tensorlab"
+      ]
     },
     {
-      "name": "tl-video",
-      "source": "./skills/tl-video",
-      "skills": "./",
-      "description": "TensorsLab Video Generation Skill. Effortlessly create stunning videos via Text-to-Video or animate images via Image-to-Video. Includes automatic scene property deduction, real-time terminal progress tracking, and seamless local downloads."
+      "name": "tensorslab-video",
+      "title": "TensorsLab 视频 AI",
+      "description": "使用 TensorsLab AI 生成视频。支持文生视频、图生视频，多种运镜和宽高比选择。电影级质量，自然语言交互，本地自动保存。",
+      "icon": "🎬",
+      "tags": [
+        "video-generation",
+        "text-to-video",
+        "image-to-video",
+        "ai-video",
+        "cinematic",
+        "animation",
+        "motion",
+        "视频",
+        "短视频",
+        "制作视频",
+        "生成视频",
+        "特效",
+        "运镜",
+        "电影",
+        "动画"
+      ],
+      "keywords": [
+        "视频生成",
+        "文生视频",
+        "图生视频",
+        "AI视频",
+        "AI生成视频",
+        "短视频制作",
+        "动画制作",
+        "电影级视频",
+        "运镜",
+        "特效视频",
+        "营销视频",
+        "广告视频",
+        "宣传视频",
+        "社交媒体视频",
+        "抖音视频",
+        "tiktok视频",
+        "tensorslab",
+        "tensorlab"
+      ]
     }
-  ]
+  ],
+  "features": [
+    "自然语言交互",
+    "本地自动保存",
+    "实时进度反馈",
+    "智能提示词优化",
+    "友好错误提示",
+    "多格式支持",
+    "电影级质量",
+    "一键生成",
+    "OpenClaw集成",
+    "CLI友好"
+  ],
+  "requirements": {
+    "api_key": "TENSORSLAB_API_KEY",
+    "api_url": "https://tensorslab.tensorslab.com"
+  },
+  "supported_platforms": ["openclaw", "claude-code"],
+  "openclaw_compatible": true,
+  "search_ranking": {
+    "priority": "high",
+    "boost_keywords": [
+      "图片",
+      "图像",
+      "视频",
+      "生成",
+      "AI",
+      "换脸",
+      "去水印",
+      "头像",
+      "p图",
+      "修图",
+      "换装",
+      "短视频"
+    ]
+  }
 }

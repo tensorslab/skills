@@ -1,0 +1,10 @@
+.git
+.gitignore
+.gitattributes
+.github
+docs/
+examples/
+tests/
+*.md
+!README.md
+!LICENSE
