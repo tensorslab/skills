@@ -194,7 +194,7 @@ def generate_image(
             error_msg = result.get("msg", "Unknown error")
             error_code = result.get("code")
             if error_code == 9000:
-                raise TensorsLabAPIError("Insufficient credits. Please top up at https://tensorslab.tensorslab.com/")
+                raise TensorsLabAPIError("Insufficient credits. Please top up at https://tensorai.tensorslab.com/")
             raise TensorsLabAPIError(f"{error_msg} (Code: {error_code})")
 
     except TensorsLabAPIError:

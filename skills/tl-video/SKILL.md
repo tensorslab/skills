@@ -165,7 +165,7 @@ Translate API errors to user-friendly messages:
 
 | Error Code | Meaning | User Message |
 |------------|---------|--------------|
-| 9000 | Insufficient credits | "亲，积分用完啦，请前往 https://tensorslab.tensorslab.com/ 充值" |
+| 9000 | Insufficient credits | "亲，积分用完啦，请前往 https://tensorai.tensorslab.com/ 充值" |
 | 9999 | General error | Show the specific error message |
 
 ## Output
