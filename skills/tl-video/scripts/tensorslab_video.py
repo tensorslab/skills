@@ -391,8 +391,8 @@ Examples:
                        help="Return the last frame as image (seedancev2 only)")
     parser.add_argument("--seed", type=int, help="Random seed for reproducibility")
     parser.add_argument("--api-key", help="TensorsLab API key (uses TENSORSLAB_API_KEY env var if not set)")
-    parser.add_argument("--poll-interval", type=int, default=10,
-                       help="Status check interval in seconds (default: 10)")
+    parser.add_argument("--poll-interval", type=int, default=2,
+                       help="Status check interval in seconds (default: 2)")
     parser.add_argument("--timeout", type=int, default=1800,
                        help="Maximum wait time in seconds (default: 1800 = 30 minutes)")
     parser.add_argument("--output-dir", "-o", type=str, default=None,

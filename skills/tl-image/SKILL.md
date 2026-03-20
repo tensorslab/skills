@@ -11,29 +11,21 @@ This skill enables AI-powered image generation through TensorsLab's API, support
 
 ## Authentication Check
 
-Before any image generation, the skill will automatically verify the API key is configured.
-
-**Automatic Authorization Flow:**
-- If `TENSORSLAB_API_KEY` is not set, the skill will automatically:
-  1. Open a browser window for you to authorize
-  2. After authorization, the API key will be saved to `~/.tensorslab/.env`
-  3. The skill will then proceed with your request
-
-**Manual Setup (Optional):**
-If you prefer to set up the API key manually:
+**BEFORE any image generation, check if API key exists. If not, run:**
 
 ```bash
-# Set environment variable directly
-# Windows (PowerShell): $env:TENSORSLAB_API_KEY="your-key-here"
-# Mac/Linux: export TENSORSLAB_API_KEY="your-key-here"
-
-# Or create/edit ~/.tensorslab/.env file:
-TENSORSLAB_API_KEY=your-key-here
+python scripts/tensorslab_auth.py
 ```
 
-To get your API key:
-1. Visit https://tensorai.tensorslab.com/ and subscribe
-2. Get your API Key from the console
+This will open a browser for authorization. Wait for "Authorization Successful!" before proceeding.
+
+**If browser fails to open**, the script will display a URL like:
+```
+[*] please copy and open the link below manually:
+[*] https://test.tensorai.tensorslab.com/auth?redirect_uri=...
+```
+
+**Show this complete URL to the user** so they can manually open it in a browser to complete authorization.
 
 ## Models
 
@@ -42,6 +34,7 @@ To get your API key:
 | **seedreamv45** | Latest enhanced model | General purpose, highest quality |
 | **seedreamv4** | Standard model | Fast generation, good quality |
 | **zimage** | Alternative model | Specific artistic styles |
+| **quickedit** | Image instruction editing | Fast color/style/object editing |
 
 Default: `seedreamv4`
 
@@ -140,6 +133,9 @@ python scripts/tensorslab_image.py "cyberpunk city" --model seedreamv45
 
 # Custom output directory
 python scripts/tensorslab_image.py "a beautiful landscape" --output-dir ./my_images
+
+# Quick editing (Fast instructions)
+python scripts/tensorslab_image.py "把主体改为蓝色" --source image.png --model quickedit
 ```
 
 ## Task Status Flow

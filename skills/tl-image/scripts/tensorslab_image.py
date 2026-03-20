@@ -113,7 +113,7 @@ def generate_image(
 
     Args:
         prompt: Text prompt for image generation
-        model: Model to use (seedreamv4, seedreamv45, zimage)
+        model: Model to use (seedreamv4, seedreamv45, zimage, quickedit)
         resolution: Image resolution (aspect ratio like "16:9", "1:1", or level like "2K", "4K", or WxH like "2048x2048")
         source_images: List of local image paths for image-to-image
         image_url: URL of source image for image-to-image
@@ -158,6 +158,8 @@ def generate_image(
         endpoint = f"{API_BASE_URL}/v1/images/zimage"
     elif model == "seedreamv4":
         endpoint = f"{API_BASE_URL}/v1/images/seedreamv4"
+    elif model == "quickedit":
+        endpoint = f"{API_BASE_URL}/v1/images/quickedit"
     else:  # seedreamv45 (default)
         endpoint = f"{API_BASE_URL}/v1/images/seedreamv45"
 
@@ -324,7 +326,7 @@ Examples:
     )
 
     parser.add_argument("prompt", help="Text prompt for image generation")
-    parser.add_argument("--model", "-m", choices=["seedreamv4", "seedreamv45", "zimage"],
+    parser.add_argument("--model", "-m", choices=["seedreamv4", "seedreamv45", "zimage", "quickedit"],
                        default="seedreamv4", help="Model to use (default: seedreamv4)")
     parser.add_argument("--resolution", "-r", default="2K",
                        help="Resolution: aspect ratio (9:16, 16:9, 1:1, etc.), level (2K, 4K), or WxH")
@@ -332,8 +334,8 @@ Examples:
                        help="Source image path for image-to-image (can be used multiple times)")
     parser.add_argument("--image-url", help="Source image URL for image-to-image")
     parser.add_argument("--api-key", help="TensorsLab API key (uses TENSORSLAB_API_KEY env var if not set)")
-    parser.add_argument("--poll-interval", type=int, default=5,
-                       help="Status check interval in seconds (default: 5)")
+    parser.add_argument("--poll-interval", type=int, default=1,
+                       help="Status check interval in seconds (default: 1)")
     parser.add_argument("--timeout", type=int, default=300,
                        help="Maximum wait time in seconds (default: 300)")
     parser.add_argument("--output-dir", "-o", type=str, default=None,

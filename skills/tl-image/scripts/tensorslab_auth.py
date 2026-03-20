@@ -29,9 +29,10 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
     """HTTP request handler for OAuth callback."""
     api_key = None
 
-    def do_GET(self):
-        parsed_path = urllib.parse.urlparse(self.path)
-        query_components = urllib.parse.parse_qs(parsed_path.query)
+    def do_POST(self):
+        content_length = int(self.headers.get('Content-Length', 0))
+        post_data = self.rfile.read(content_length).decode('utf-8')
+        query_components = urllib.parse.parse_qs(post_data)
 
         if "token" in query_components:
             AuthHandler.api_key = query_components["token"][0]
@@ -187,3 +188,10 @@ def get_or_authorize_api_key(key_name: str = "TENSORSLAB_API_KEY") -> str:
     api_key = start_auth_flow(key_name=key_name)
     os.environ["TENSORSLAB_API_KEY"] = api_key
     return api_key
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    api_key = get_or_authorize_api_key()
+    if api_key:
+        logger.info(f"[Success] API Key: {api_key[:4]}****{api_key[-4:]}")
