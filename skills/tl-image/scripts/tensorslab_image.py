@@ -159,6 +159,8 @@ def generate_image(
             opened_files.append(f)
             files.append(("sourceImage", (os.path.basename(img_path), f)))
     elif image_url:
+        if not (image_url.startswith("http://") or image_url.startswith("https://")):
+            raise TensorsLabAPIError(f"Invalid image_url: {image_url}. Must be a standard URL (http:// or https://).")
         files.append(("imageUrl", (None, image_url)))
 
     # Determine endpoint

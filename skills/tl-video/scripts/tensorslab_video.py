@@ -212,6 +212,10 @@ def generate_video(
             opened_files.append(f)
             files.append(("sourceImage", (os.path.basename(img_path), f)))
     elif image_url:
+        urls = [url.strip() for url in image_url.split(",")]
+        for url in urls:
+            if not (url.startswith("http://") or url.startswith("https://")):
+                raise TensorsLabAPIError(f"Invalid image_url: {url}. Must be a standard URL (http:// or https://).")
         files.append(("imageUrl", (None, image_url)))
 
     # Determine endpoint
