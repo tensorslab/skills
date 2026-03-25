@@ -43,11 +43,18 @@ npx skills add tensorslab/skills -g -y
 | `tl-image` | Generate images using TensorsLab's AI image generation models. Supports text-to-image and image-to-image generation with automatic prompt enhancement, progress tracking, and local file saving. | [SKILL.md](skills/tl-image/SKILL.md) |
 | `tl-video` | Generate videos using TensorsLab's AI video generation models. Supports text-to-video and image-to-video generation with automatic prompt enhancement, progress tracking, and local file saving. | [SKILL.md](skills/tl-video/SKILL.md) |
 
-## Environment Setup
+## Authorization
 
-Before using TensorsLab skills, configure your API key:
+Before using TensorsLab skills, you need to authorize. The system will attempt to authorize automatically when you first run a skill.
 
-Get your API Key at [TensorsLab Console](https://tensorai.tensorslab.com/).
+### 1. Automatic Authorization (Recommended)
+When you first use a skill, it will automatically trigger a browser-based authorization flow. Follow the prompts in your browser to complete the process. Once successful, your credentials will be stored locally in `~/.tensorslab/.env`.
+
+### 2. Manual Configuration (Optional)
+If automatic authorization is not possible or fails, you can manually set your API key:
+
+1. Get your API Key at [TensorsLab Console](https://tensorai.tensorslab.com/).
+2. Set the environment variable:
 
 ```bash
 # Windows (PowerShell)
