@@ -1,3 +1,5 @@
+[English](README.md) | [中文](README_zh.md)
+
 # TensorLab Skills
 
 TensorLab Skills are AI task definitions for Claude Code, focusing on multimedia generation and processing using TensorsLab's AI models. It provides comprehensive capabilities including text-to-image and image-to-image generation, advanced image editing (avatar generation, watermark removal, object erasure, face replacement), as well as text-to-video and image-to-video generation.
