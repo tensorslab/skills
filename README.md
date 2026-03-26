@@ -52,17 +52,17 @@ Before using TensorsLab skills, you need to authorize. The system will attempt t
 ### 1. Automatic Authorization (Recommended)
 When you first use a skill, it will automatically trigger a browser-based authorization flow. Follow the prompts in your browser to complete the process. Once successful, your credentials will be stored locally in `~/.tensorslab/.env`.
 
-### 2. Manual Configuration (Optional)
-If automatic authorization is not possible or fails, you can manually set your API key:
+### 2. Manual Configuration (For Cloud/Headless Environments)
+If automatic authorization is not possible or fails (e.g., when the agent or openclaw is running in the cloud without a browser, the authorization URL callback will also fail), you must manually set your API key:
 
 1. Get your API Key at [TensorsLab Console](https://tensorai.tensorslab.com/).
-2. Set the environment variable:
+2. Set the environment variable in your cloud environment or local terminal:
 
 ```bash
 # Windows (PowerShell)
 $env:TENSORSLAB_API_KEY="your-api-key"
 
-# Mac/Linux
+# Mac/Linux/Cloud
 export TENSORSLAB_API_KEY="your-api-key"
 ```
 
