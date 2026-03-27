@@ -23,13 +23,12 @@ python scripts/tensorslab_auth.py
 ```
 This will open a browser for authorization. Wait for "Authorization Successful!" before proceeding.
 
-**If browser fails to open**, the script will display a URL. Show this URL to the user so they can manually open it in a browser to complete authorization.
 
 After authorization, the API key is stored in `~/.tensorslab/.env` and you don't need to re-authorize unless the key expires.
 
 ### 2. Manual Configuration (For Cloud/Headless Environments)
 **When the agent or openclaw operates in a cloud environment without a browser, the URL authorization method will also fail.** In this scenario, you must instruct the user to manually acquire their API key and configure it in the cloud environment:
-1. Direct the user to get their API Key at [TensorsLab Console](https://tensorai.tensorslab.com/).
+1. Direct the user to get their API Key at [TensorsLab Console](https://tensorai.tensorslab.com/apikey).
 2. Set the `TENSORSLAB_API_KEY` environment variable in the cloud environment.
 
 ## Models

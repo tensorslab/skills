@@ -55,7 +55,7 @@ When you first use a skill, it will automatically trigger a browser-based author
 ### 2. Manual Configuration (For Cloud/Headless Environments)
 If automatic authorization is not possible or fails (e.g., when the agent or openclaw is running in the cloud without a browser, the authorization URL callback will also fail), you must manually set your API key:
 
-1. Get your API Key at [TensorsLab Console](https://tensorai.tensorslab.com/).
+1. Get your API Key at [TensorsLab Console](https://tensorai.tensorslab.com/apikey).
 2. Set the environment variable in your cloud environment or local terminal:
 
 ```bash

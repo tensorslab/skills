@@ -55,7 +55,7 @@ npx skills add tensorslab/skills -g -y
 ### 2. 手动配置 (可选)
 如果无法进行自动授权或授权失败，您可以手动设置 API 密钥：
 
-1. 在 [TensorsLab 控制台](https://tensorai.tensorslab.com/) 获取您的 API 密钥。
+1. 在 [TensorsLab 控制台](https://tensorai.tensorslab.com/apikey) 获取您的 API 密钥。
 2. 设置环境变量：
 
 ```bash

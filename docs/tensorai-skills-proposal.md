@@ -10,7 +10,7 @@
 2. **友好的引导文案**：如果未设置，温和地输出：
    ```text
    您好！要生成高质量的内容，您需要先进行简单的配置：
-   1. 访问 https://tensorai.tensorslab.com/ 登录并订阅。
+   1. 访问 https://tensorai.tensorslab.com/apikey 登录并订阅。
    2. 在控制台中获取您的专属 API Key。
    3. 将其保存为环境变量：
       - Windows (PowerShell): $env:TENSORSLAB_API_KEY="您的Key"

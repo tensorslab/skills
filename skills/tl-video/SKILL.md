@@ -23,7 +23,6 @@ python scripts/tensorslab_auth.py
 ```
 This will open a browser for authorization. Wait for "Authorization Successful!" before proceeding.
 
-**If browser fails to open**, the script will display a URL. Show this URL to the user so they can manually open it in a browser to complete authorization.
 
 After authorization, the API key is stored in `~/.tensorslab/.env` and you don't need to re-authorize unless the key expires.
 
