@@ -31,6 +31,11 @@ except ImportError:
     logger.error("Error: pyyaml module is required. Install with: pip install pyyaml")
     YAML_AVAILABLE = False
 
+# Resolve script directory so imports work regardless of CWD
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+if SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, SCRIPT_DIR)
+
 # Import the shared auth module
 from tensorslab_auth import get_or_authorize_api_key, API_BASE_URL, DEFAULT_OUTPUT_DIR
 
@@ -299,7 +304,7 @@ def wait_and_download(
         output_dir: Output directory path (default: ./tensorslab_output)
 
     Returns:
-        List of downloaded file paths
+        List of dicts with 'file' (local path) and 'url' (remote URL) for each downloaded image
     """
     if api_key is None:
         api_key = get_api_key()
@@ -340,7 +345,7 @@ def wait_and_download(
                 logger.info(f"📥 Downloading image {i+1}/{len(urls)}")
                 final_path = download_image(url, output_path)
                 if final_path:
-                    downloaded_files.append(str(final_path))
+                    downloaded_files.append({"file": str(final_path), "url": url})
                     # Save URL mapping (use actual filename with extension)
                     save_url_mapping(output_dir, final_path.name, url)
 
@@ -421,8 +426,9 @@ Examples:
         )
 
         logger.info(f"\n🎉 All done! Downloaded {len(downloaded)} image(s) to {output_dir}/")
-        for f in downloaded:
-            logger.info(f"   - {f}")
+        for item in downloaded:
+            logger.info(f"   - File: {item['file']}")
+            logger.info(f"     URL:  {item['url']}")
     except TensorsLabAPIError as e:
         logger.error(f"❌ {e}")
         sys.exit(1)

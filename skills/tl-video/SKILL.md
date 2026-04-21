@@ -9,6 +9,19 @@ description: Generate videos using TensorsLab's AI video generation models. Supp
 
 This skill enables AI-powered video generation through TensorsLab's API, supporting both text-to-video and image-to-video workflows. Video generation is a time-intensive process - tasks typically take several minutes to complete.
 
+## Script Path
+
+The Python scripts for this skill are located in the `scripts/` subdirectory relative to this SKILL.md file. **Always use the absolute path when executing scripts.** Determine the absolute path based on where this skill is installed.
+
+For example, if this SKILL.md is at `/path/to/skills/tl-video/SKILL.md`, then:
+- Auth script: `python "/path/to/skills/tl-video/scripts/tensorslab_auth.py"`
+- Video script: `python "/path/to/skills/tl-video/scripts/tensorslab_video.py"`
+
+When executing, construct the command using the resolved absolute path:
+```bash
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_video.py" <args>
+```
+
 ## Authorization
 
 **BEFORE any video generation, you must ensure you are authorized with TensorsLab.**
@@ -19,7 +32,7 @@ The authorization script will automatically check if an API key already exists i
 
 Run:
 ```bash
-python scripts/tensorslab_auth.py
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_auth.py"
 ```
 This will open a browser for authorization. Wait for "Authorization Successful!" before proceeding.
 
@@ -133,25 +146,25 @@ Execute the Python script directly:
 
 ```bash
 # Text-to-video (default 5s, vertical 9:16)
-python scripts/tensorslab_video.py "a spaceship flying through space"
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_video.py" "a spaceship flying through space"
 
 # 10 second horizontal video
-python scripts/tensorslab_video.py "sunset over ocean waves" --duration 10 --ratio 16:9
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_video.py" "sunset over ocean waves" --duration 10 --ratio 16:9
 
 # Image-to-video with local file
-python scripts/tensorslab_video.py "make this photo come alive" --source portrait.jpg
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_video.py" "make this photo come alive" --source portrait.jpg
 
 # Image-to-video with URL
-python scripts/tensorslab_video.py "make this photo come alive" --image-url https://example.com/portrait.jpg
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_video.py" "make this photo come alive" --image-url https://example.com/portrait.jpg
 
 # Fast preview
-python scripts/tensorslab_video.py "abstract flowing colors" --model seedancev1profast
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_video.py" "abstract flowing colors" --model seedancev1profast
 
 # High quality with audio
-python scripts/tensorslab_video.py "epic mountain timelapse" --resolution 1440p --duration 10 --audio
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_video.py" "epic mountain timelapse" --resolution 1440p --duration 10 --audio
 
 # Custom output directory
-python scripts/tensorslab_video.py "a sunset timelapse" --output-dir ./my_videos
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_video.py" "a sunset timelapse" --output-dir ./my_videos
 ```
 
 ## Task Status Flow
@@ -187,9 +200,11 @@ All videos are saved to output directory with naming pattern:
 abcd_1234567890_0.mp4: https://tensorai.tensorslab.com/videos/abcd_1234567890_0.mp4
 ```
 
-After completion, inform user:
+After completion, the script outputs both the local file path and the remote URL. Inform user with both:
 ```
-🎉 您的视频处理完毕！已存放于 ./tensorslab_output/{filename}
+🎉 您的视频处理完毕！
+   - File: ./tensorslab_output/{filename}
+   - URL: {remote_url}
 ```
 
 ## Tips for Better Results

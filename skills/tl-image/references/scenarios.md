@@ -4,6 +4,8 @@
 
 All scenarios below use the same script `scripts/tensorslab_image.py`. The difference is in the **prompt engineering** - each scenario requires specific prompt templates and enhancements to achieve the desired effect.
 
+**Note:** Always use the absolute path when running scripts. Replace `<SKILL_DIR>` with the absolute path to the directory containing this skill's SKILL.md.
+
 ## Avatar Generation
 
 Generate profile/avatar images in various styles. Supports both generation from text description and generation based on a reference image.
@@ -59,10 +61,10 @@ Style transformation examples:
 **Commands:**
 ```bash
 # Without reference image
-python scripts/tensorslab_image.py "[enhanced prompt]" --resolution 1:1
+python "<SKILL_DIR>/scripts/tensorslab_image.py" "[enhanced prompt]" --resolution 1:1
 
 # With reference image
-python scripts/tensorslab_image.py "[enhanced prompt]" --source ./photo.jpg --resolution 1:1
+python "<SKILL_DIR>/scripts/tensorslab_image.py" "[enhanced prompt]" --source ./photo.jpg --resolution 1:1
 ```
 
 ---
@@ -92,7 +94,7 @@ should be preserved.
 
 **Command:**
 ```bash
-python scripts/tensorslab_image.py "[removal prompt]" --source ./image.jpg
+python "<SKILL_DIR>/scripts/tensorslab_image.py" "[removal prompt]" --source ./image.jpg
 ```
 
 ---
@@ -128,7 +130,7 @@ Object examples:
 
 **Command:**
 ```bash
-python scripts/tensorslab_image.py "[erasure prompt]" --source ./photo.jpg
+python "<SKILL_DIR>/scripts/tensorslab_image.py" "[erasure prompt]" --source ./photo.jpg
 ```
 
 ---
@@ -171,7 +173,7 @@ Face description examples (for target image with multiple faces):
 
 **Command:**
 ```bash
-python scripts/tensorslab_image.py "[replacement prompt]" --source ./face.jpg --source ./target.jpg
+python "<SKILL_DIR>/scripts/tensorslab_image.py" "[replacement prompt]" --source ./face.jpg --source ./target.jpg
 ```
 
 **Note:** Both images are passed via `--source` parameters. The first source is the face to use, the second source is the target image where the replacement happens.

@@ -9,6 +9,19 @@ description: "Generate and edit images using TensorsLab's AI models. Supports te
 
 This skill enables AI-powered image generation through TensorsLab's API, supporting both text-to-image and image-to-image workflows. The agent enhances user prompts with detailed visual descriptions before calling the API, ensuring high-quality outputs.
 
+## Script Path
+
+The Python scripts for this skill are located in the `scripts/` subdirectory relative to this SKILL.md file. **Always use the absolute path when executing scripts.** Determine the absolute path based on where this skill is installed.
+
+For example, if this SKILL.md is at `/path/to/skills/tl-image/SKILL.md`, then:
+- Auth script: `python "/path/to/skills/tl-image/scripts/tensorslab_auth.py"`
+- Image script: `python "/path/to/skills/tl-image/scripts/tensorslab_image.py"`
+
+When executing, construct the command using the resolved absolute path:
+```bash
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_image.py" <args>
+```
+
 ## Authorization
 
 **BEFORE any image generation, you must ensure you are authorized with TensorsLab.**
@@ -19,7 +32,7 @@ The authorization script will automatically check if an API key already exists i
 
 Run:
 ```bash
-python scripts/tensorslab_auth.py
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_auth.py"
 ```
 This will open a browser for authorization. Wait for "Authorization Successful!" before proceeding.
 
@@ -127,25 +140,25 @@ Execute the Python script directly:
 
 ```bash
 # Text-to-image
-python scripts/tensorslab_image.py "a cat on the moon"
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_image.py" "a cat on the moon"
 
 # With specific resolution
-python scripts/tensorslab_image.py "sunset over mountains" --resolution 16:9
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_image.py" "sunset over mountains" --resolution 16:9
 
 # Image-to-image with local file
-python scripts/tensorslab_image.py "watercolor style" --source cat.png
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_image.py" "watercolor style" --source cat.png
 
 # Image-to-image with URL
-python scripts/tensorslab_image.py "watercolor style" --image-url https://example.com/cat.jpg
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_image.py" "watercolor style" --image-url https://example.com/cat.jpg
 
 # Specify model
-python scripts/tensorslab_image.py "cyberpunk city" --model seedreamv5
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_image.py" "cyberpunk city" --model seedreamv5
 
 # Custom output directory
-python scripts/tensorslab_image.py "a beautiful landscape" --output-dir ./my_images
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_image.py" "a beautiful landscape" --output-dir ./my_images
 
 # Quick editing (Fast instructions)
-python scripts/tensorslab_image.py "把主体改为蓝色" --source image.png --model quickedit
+python "<absolute_path_to_skill_dir>/scripts/tensorslab_image.py" "把主体改为蓝色" --source image.png --model quickedit
 ```
 
 ## Task Status Flow
@@ -181,9 +194,11 @@ abcd_1234567890_0.png: https://tensorai.tensorslab.com/images/abcd_1234567890_0.
 abcd_1234567890_1.png: https://tensorai.tensorslab.com/images/abcd_1234567890_1.png
 ```
 
-After completion, inform user:
+After completion, the script outputs both the local file path and the remote URL. Inform user with both:
 ```
-🎉 您的图片处理完毕！已存放于 ./tensorslab_output/{filename}
+🎉 您的图片处理完毕！
+   - File: ./tensorslab_output/{filename}
+   - URL: {remote_url}
 ```
 
 ## Resources
