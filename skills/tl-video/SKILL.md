@@ -34,15 +34,18 @@ Run:
 ```bash
 python "<absolute_path_to_skill_dir>/scripts/tensorslab_auth.py"
 ```
-This will open a browser for authorization. Wait for "Authorization Successful!" before proceeding.
 
+**On Windows/macOS**: This will open a browser for authorization. Wait for "Authorization Successful!" before proceeding.
+
+**On Linux**: Browser auth is automatically skipped. The script will print instructions to get your API key manually from [TensorsLab Console](https://tensorai.tensorslab.com/apikey). Set it via:
+```bash
+export TENSORSLAB_API_KEY=your_api_key_here
+```
 
 After authorization, the API key is stored in `~/.tensorslab/.env` and you don't need to re-authorize unless the key expires.
 
-### 2. Manual Configuration (For Cloud/Headless Environments)
-**When the agent or openclaw operates in a cloud environment without a browser, the URL authorization method will also fail.** In this scenario, you must instruct the user to manually acquire their API key and configure it in the cloud environment:
-1. Direct the user to get their API Key at [TensorsLab Console](https://tensorai.tensorslab.com/).
-2. Set the `TENSORSLAB_API_KEY` environment variable in the cloud environment.
+### 2. Key Persistence
+When the API key is provided via `export TENSORSLAB_API_KEY=xxx` or `--api-key` argument and a generation task succeeds, the key is **automatically saved** to `~/.tensorslab/.env`. Future sessions will pick it up without needing to export again.
 
 ## Models
 

@@ -36,7 +36,7 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 # Import the shared auth module
-from tensorslab_auth import get_or_authorize_api_key, API_BASE_URL, DEFAULT_OUTPUT_DIR
+from tensorslab_auth import get_or_authorize_api_key, save_api_key_to_env, API_BASE_URL, DEFAULT_OUTPUT_DIR
 
 # 禁用代理仅限当前 session，不影响进程级环境变量
 _SESSION = requests.Session()
@@ -504,6 +504,11 @@ Examples:
         for item in downloaded:
             logger.info(f"   - File: {item['file']}")
             logger.info(f"     URL:  {item['url']}")
+
+        # Persist API key to ~/.tensorslab/.env for future sessions
+        persisted_key = args.api_key or os.environ.get("TENSORSLAB_API_KEY")
+        if persisted_key:
+            save_api_key_to_env(persisted_key)
     except TensorsLabAPIError as e:
         logger.error(f"❌ {e}")
         sys.exit(1)

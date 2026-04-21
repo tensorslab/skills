@@ -7,6 +7,8 @@ Shared by both image and video generation skills.
 """
 
 import os
+import sys
+import platform
 import http.server
 import urllib.parse
 import webbrowser
@@ -23,6 +25,43 @@ AUTH_BASE_URL = "https://tensorai.tensorslab.com/auth"
 USER_CONFIG_DIR = os.path.expanduser("~/.tensorslab")
 ENV_FILE_PATH = os.path.join(USER_CONFIG_DIR, ".env")
 DEFAULT_OUTPUT_DIR = Path(".") / "tensorslab_output"
+
+
+def _is_headless_environment() -> bool:
+    """Check if the current environment is headless (no browser available).
+
+    Returns True when:
+    - Pure Linux without display server (cloud server, CI, Docker)
+    - Other Unix-like systems (FreeBSD, etc.)
+
+    Returns False when:
+    - Windows or macOS (always have browsers)
+    - WSL (can delegate to Windows browser)
+    - Linux with X11 or Wayland display (desktop environment)
+    """
+    system = platform.system()
+
+    if system in ("Windows", "Darwin"):
+        return False
+
+    if system == "Linux":
+        # WSL can open Windows browser
+        try:
+            with open("/proc/version", "r") as f:
+                version_info = f.read().lower()
+                if "microsoft" in version_info or "wsl" in version_info:
+                    return False
+        except (FileNotFoundError, PermissionError):
+            pass
+
+        # Desktop Linux has DISPLAY or WAYLAND_DISPLAY
+        if os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"):
+            return False
+
+        return True
+
+    # FreeBSD, OpenBSD, AIX, etc. — treat as headless
+    return True
 
 
 class AuthHandler(http.server.BaseHTTPRequestHandler):
@@ -160,13 +199,43 @@ def load_api_key_from_env() -> str | None:
     return None
 
 
+def save_api_key_to_env(api_key: str):
+    """Save API key to ~/.tensorslab/.env for future sessions."""
+    try:
+        os.makedirs(os.path.dirname(ENV_FILE_PATH), exist_ok=True)
+
+        lines = []
+        if os.path.exists(ENV_FILE_PATH):
+            with open(ENV_FILE_PATH, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+
+        new_lines = []
+        key_updated = False
+        for line in lines:
+            if line.startswith("TENSORSLAB_API_KEY="):
+                new_lines.append(f"TENSORSLAB_API_KEY={api_key}\n")
+                key_updated = True
+            else:
+                new_lines.append(line)
+
+        if not key_updated:
+            new_lines.append(f"TENSORSLAB_API_KEY={api_key}\n")
+
+        with open(ENV_FILE_PATH, "w", encoding="utf-8") as f:
+            f.writelines(new_lines)
+
+        logger.info(f"[Success] API Key persisted to: {ENV_FILE_PATH}")
+    except Exception as e:
+        logger.warning(f"[Warning] Failed to save API key to .env: {e}")
+
+
 def get_or_authorize_api_key(key_name: str = "TENSORSLAB_API_KEY") -> str:
     """
     Get API key from environment or trigger authorization flow.
 
     This function first checks if TENSORSLAB_API_KEY is set in the environment.
     If not, it checks ~/.tensorslab/.env file. If still not found, it triggers
-    the browser-based authorization flow.
+    the browser-based authorization flow (on non-Linux systems).
 
     Returns:
         The API key.
@@ -183,7 +252,19 @@ def get_or_authorize_api_key(key_name: str = "TENSORSLAB_API_KEY") -> str:
         os.environ["TENSORSLAB_API_KEY"] = api_key
         return api_key
 
-    # Trigger authorization flow
+    # On headless environments, skip browser auth
+    if _is_headless_environment():
+        logger.error("=" * 60)
+        logger.error("[!] Running in Linux environment — browser auth is not available.")
+        logger.error("[!] Please get your API key from:")
+        logger.error("[!]   https://tensorai.tensorslab.com/apikey")
+        logger.error("[!] Then set it via:")
+        logger.error("[!]   export TENSORSLAB_API_KEY=your_api_key_here")
+        logger.error("[!] Or re-run this script with: --api-key YOUR_KEY")
+        logger.error("=" * 60)
+        sys.exit(1)
+
+    # Trigger browser-based authorization flow
     logger.info("TENSORSLAB_API_KEY not found. Starting authorization flow...")
     api_key = start_auth_flow(key_name=key_name)
     os.environ["TENSORSLAB_API_KEY"] = api_key
