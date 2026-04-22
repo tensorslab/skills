@@ -37,6 +37,7 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 # Import the shared auth module
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tensorslab_auth import get_or_authorize_api_key, save_api_key_to_env, API_BASE_URL, DEFAULT_OUTPUT_DIR
 
 # 禁用代理仅限当前 session，不影响进程级环境变量
