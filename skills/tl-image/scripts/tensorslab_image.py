@@ -176,7 +176,9 @@ def generate_image(
         endpoint = f"{API_BASE_URL}/v1/images/seedreamv4"
     elif model == "quickedit":
         endpoint = f"{API_BASE_URL}/v1/images/quickedit"
-    else:  # seedreamv5 (default)
+    else:  # seedreamv5
+        if model == "seedreamv5":
+            logger.info("⚠️ 注意：seedreamv5 模型生成质量更高，但速度显著较慢，请耐心等待。")
         endpoint = f"{API_BASE_URL}/v1/images/seedreamv5"
 
     try:
@@ -387,7 +389,7 @@ Examples:
 
     parser.add_argument("prompt", help="Text prompt for image generation")
     parser.add_argument("--model", "-m", choices=["seedreamv4", "seedreamv5", "zimage", "quickedit"],
-                       default="seedreamv4", help="Model to use (default: seedreamv4)")
+                       default="seedreamv4", help="Model to use (default: seedreamv4, v5 is slow)")
     parser.add_argument("--resolution", "-r", default="2K",
                        help="Resolution: aspect ratio (9:16, 16:9, 1:1, etc.), level (2K, 4K), or WxH")
     parser.add_argument("--source", "-s", action="append", dest="sources",
