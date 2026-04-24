@@ -275,4 +275,4 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     api_key = get_or_authorize_api_key()
     if api_key:
-        logger.info(f"[Success] API Key: {api_key[:4]}****{api_key[-4:]}")
+        print(f"[Success] API Key: {api_key[:4]}****{api_key[-4:]}")
