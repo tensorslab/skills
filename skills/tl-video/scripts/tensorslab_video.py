@@ -169,7 +169,7 @@ def generate_video(
 
     Args:
         prompt: Text prompt for video generation
-        model: Model to use (seedancev1, seedancev15pro, seedancev1profast, seedancev2)
+        model: Model to use (seedancev15pro, seedancev1profast, seedancev2)
         ratio: Video aspect ratio (9:16, 16:9, etc.)
         duration: Video duration in seconds (5-15)
         resolution: Video resolution (480p, 720p, 1080p, 1440p)
@@ -224,9 +224,14 @@ def generate_video(
                 raise TensorsLabAPIError(f"Invalid image_url: {url}. Must be a standard URL (http:// or https://).")
         files.append(("imageUrl", (None, image_url)))
 
+    if model == "seedancev2" and (source_images or image_url):
+        logger.warning(
+            "⚠️ seedancev2 does not support human-face source images for image-to-video. "
+            "If your source contains faces, use seedancev1profast or seedancev15pro."
+        )
+
     # Determine endpoint
     endpoint_map = {
-        "seedancev1": f"{API_BASE_URL}/v1/video/seedancev1",
         "seedancev15pro": f"{API_BASE_URL}/v1/video/seedancev15pro",
         "seedancev1profast": f"{API_BASE_URL}/v1/video/seedancev1profast",
         "seedancev2": f"{API_BASE_URL}/v1/video/seedancev2",
@@ -338,6 +343,7 @@ def wait_and_download(
         api_key = get_api_key()
     if output_dir is None:
         output_dir = DEFAULT_OUTPUT_DIR
+    output_dir = Path(output_dir).expanduser().resolve()
 
     ensure_output_dir(output_dir)
     downloaded_files = []
@@ -425,9 +431,9 @@ Examples:
 
     parser.add_argument("prompt", help="Text prompt for video generation")
     parser.add_argument("--model", "-m",
-                       choices=["seedancev1", "seedancev15pro", "seedancev1profast", "seedancev2"],
+                       choices=["seedancev15pro", "seedancev1profast", "seedancev2"],
                        default="seedancev1profast",
-                       help="Model to use (default: seedancev1profast - fast and good quality)")
+                       help="Model to use (default: seedancev1profast; seedancev2 has higher quality but is much slower)")
     parser.add_argument("--ratio", "-r", default="9:16",
                        help="Video aspect ratio (default: 9:16 vertical)")
     parser.add_argument("--duration", "-d", type=int, default=5,
@@ -460,9 +466,9 @@ Examples:
     logging.basicConfig(level=log_level, format="%(asctime)s - %(levelname)s - %(message)s")
 
     # Setup output directory
-    output_dir = DEFAULT_OUTPUT_DIR
+    output_dir = Path(DEFAULT_OUTPUT_DIR).expanduser().resolve()
     if args.output_dir:
-        output_dir = Path(args.output_dir)
+        output_dir = Path(args.output_dir).expanduser().resolve()
 
     # Validate duration based on model
     max_duration = 15 if args.model == "seedancev2" else 10
@@ -502,9 +508,20 @@ Examples:
         )
 
         logger.info(f"\n🎉 您的视频处理完毕！已存放于 {output_dir}/")
-        for item in downloaded:
-            logger.info(f"   - File: {item['file']}")
-            logger.info(f"     URL:  {item['url']}")
+
+        # Emit a structured result to stdout so ADK run_skill_script can pass it
+        # back to the agent even when logging output is not captured.
+        print(
+            json.dumps(
+                {
+                    "ok": True,
+                    "task_id": task_id,
+                    "output_dir": str(output_dir),
+                    "downloads": downloaded,
+                },
+                ensure_ascii=False,
+            )
+        )
 
         # Persist API key to ~/.tensorslab/.env for future sessions
         persisted_key = args.api_key or os.environ.get("TENSORSLAB_API_KEY")

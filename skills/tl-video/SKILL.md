@@ -51,12 +51,14 @@ When the API key is provided via `export TENSORSLAB_API_KEY=xxx` or `--api-key` 
 
 | Model | Description | Best For | Max Duration |
 |-------|-------------|----------|--------------|
-| **seedancev2** | Latest, highest quality | General purpose, cinematic content | 15s |
+| **seedancev2** | Highest quality, much slower generation | Cinematic content where quality is priority | 15s |
 | **seedancev15pro** | Pro quality | High-end productions | 10s |
-| **seedancev1profast** | Fast generation | Quick previews | 10s |
-| **seedancev1** | Standard lite | Basic videos | 10s |
+| **seedancev1profast** | Fast generation with solid quality | Default model, quick previews | 10s |
 
-Default: `seedancev1profast`
+Default model: `seedancev1profast` (recommended for most requests)
+
+Notes:
+- `seedancev2` has the best visual quality but is significantly slower than 1.x models.
 
 ## Workflow
 
@@ -96,6 +98,10 @@ User request: "让这张人物合影 family.jpg 动起来" or "让风景照动�
 - `imageUrl`: Comma-separated URLs of source images (Must be standard HTTP/HTTPS URLs. Do NOT use local paths like /tmp/xxx.png here)
 - `prompt`: Description of desired motion/animation
 
+**Model limitation:**
+- `seedancev2` does **not** support human-face source images for image-to-video.
+- If the source image contains a human face, use `seedancev1profast` (default) or `seedancev15pro` instead.
+
 ### 3. Resolution and Aspect Ratio
 
 **Aspect ratios:**
@@ -114,7 +120,7 @@ User request: "让这张人物合影 family.jpg 动起来" or "让风景照动�
 - **seedancev2**: 5-15 seconds
 - **Other models**: 5-10 seconds
 
-Longer videos take proportionally more time to generate.
+Longer videos take proportionally more time to generate. `seedancev2` is notably slower even at the same duration/resolution.
 
 ### 5. Special Features (seedancev2 only)
 

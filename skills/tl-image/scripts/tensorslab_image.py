@@ -311,6 +311,7 @@ def wait_and_download(
         api_key = get_api_key()
     if output_dir is None:
         output_dir = DEFAULT_OUTPUT_DIR
+    output_dir = Path(output_dir).expanduser().resolve()
 
     ensure_output_dir(output_dir)
     downloaded_files = []
@@ -402,9 +403,9 @@ Examples:
     logging.basicConfig(level=log_level, format="%(asctime)s - %(levelname)s - %(message)s")
 
     # Setup output directory
-    output_dir = DEFAULT_OUTPUT_DIR
+    output_dir = Path(DEFAULT_OUTPUT_DIR).expanduser().resolve()
     if args.output_dir:
-        output_dir = Path(args.output_dir)
+        output_dir = Path(args.output_dir).expanduser().resolve()
 
     try:
         # Generate image
@@ -427,9 +428,20 @@ Examples:
         )
 
         logger.info(f"\n🎉 All done! Downloaded {len(downloaded)} image(s) to {output_dir}/")
-        for item in downloaded:
-            logger.info(f"   - File: {item['file']}")
-            logger.info(f"     URL:  {item['url']}")
+
+        # Emit a structured result to stdout so ADK run_skill_script can pass it
+        # back to the agent even when logging output is not captured.
+        print(
+            json.dumps(
+                {
+                    "ok": True,
+                    "task_id": task_id,
+                    "output_dir": str(output_dir),
+                    "downloads": downloaded,
+                },
+                ensure_ascii=False,
+            )
+        )
 
         # Persist API key to ~/.tensorslab/.env for future sessions
         persisted_key = args.api_key or os.environ.get("TENSORSLAB_API_KEY")

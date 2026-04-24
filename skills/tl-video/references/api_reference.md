@@ -40,7 +40,7 @@ All responses follow this structure:
 
 **Endpoint:** `POST /v1/video/seedancev2`
 
-**Recommended for:** Highest quality, general purpose
+**Recommended for:** Highest quality, cinematic output (slower generation)
 
 **Parameters (multipart/form-data):**
 
@@ -55,6 +55,8 @@ All responses follow this structure:
 | `generate_audio` | string | No | "1" to generate audio |
 | `return_last_frame` | string | No | "1" to return last frame as image |
 | `seed` | integer | No | Random seed |
+
+**Limitation:** `seedancev2` does not support human-face source images for image-to-video. For face-based image animation, use `seedancev1profast` or `seedancev15pro`.
 
 **Response:**
 
@@ -86,16 +88,6 @@ Same as seedancev2 except:
 **Endpoint:** `POST /v1/video/seedancev1profast`
 
 **Recommended for:** Quick previews, faster generation
-
-**Parameters:**
-
-Same as seedancev15pro
-
-### 4. Generate Video (SeeDance V1 Lite)
-
-**Endpoint:** `POST /v1/video/seedancev1`
-
-**Recommended for:** Basic videos, cost-effective
 
 **Parameters:**
 
@@ -181,7 +173,7 @@ Same as seedancev15pro
 | Model | Range |
 |-------|-------|
 | seedancev2 | 5-15 seconds |
-| Others | 5-10 seconds |
+| seedancev15pro / seedancev1profast | 5-10 seconds |
 
 ## Error Handling
 
