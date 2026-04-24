@@ -95,23 +95,31 @@ def download_video(url: str, output_path: Path) -> bool:
         response = _SESSION.get(url, timeout=300, stream=True)
         response.raise_for_status()
         total_size = int(response.headers.get('content-length', 0))
+        progress_markers = [10, 25, 50, 75, 100]
+        next_marker_idx = 0
 
         with open(output_path, 'wb') as f:
             if total_size > 0:
+                size_mb = total_size / (1024 * 1024)
+                logger.info(f"📥 Downloading video ({size_mb:.1f} MB): {output_path}")
                 downloaded = 0
                 for chunk in response.iter_content(chunk_size=8192):
                     if chunk:
                         f.write(chunk)
                         downloaded += len(chunk)
                         percent = (downloaded / total_size) * 100
-                        logger.info(f"\r📥 Downloading: {percent:.1f}%")
+                        while next_marker_idx < len(progress_markers) and percent >= progress_markers[next_marker_idx]:
+                            marker = progress_markers[next_marker_idx]
+                            logger.info(f"📥 Download progress: {marker}%")
+                            next_marker_idx += 1
             else:
+                logger.info(f"📥 Downloading video: {output_path}")
                 f.write(response.content)
 
-        logger.info(f"\r✅ Download complete: {output_path}")
+        logger.info(f"✅ Download complete: {output_path}")
         return True
     except Exception as e:
-        logger.warning(f"\r⚠️ Failed to download video from {url}: {e}")
+        logger.warning(f"⚠️ Failed to download video from {url}: {e}")
         return False
 
 
@@ -353,6 +361,8 @@ def wait_and_download(
     logger.info(f"   (This may take several minutes - please be patient)")
 
     last_heartbeat = 0
+    last_status = None
+    last_status_log = -999999
 
     while time.time() - start_time < timeout:
         task_data = query_task_status(task_id, api_key)
@@ -365,13 +375,16 @@ def wait_and_download(
         status_text = TASK_STATUS.get(status, "Unknown")
         elapsed = int(time.time() - start_time)
 
-        # Heartbeat every 60 seconds to show progress
-        if elapsed - last_heartbeat >= 60 or status == 3:
-            if status == 2:
-                logger.info(f"🚀 正在渲染电影级大片，已耗时 {elapsed} 秒，请稍安勿躁...")
-                last_heartbeat = elapsed
+        should_log_status = (status != last_status) or (elapsed - last_status_log >= 60)
+        if should_log_status:
+            logger.info(f"🔄 Status: {status_text} (elapsed: {elapsed}s)")
+            last_status = status
+            last_status_log = elapsed
 
-        logger.info(f"🔄 Status: {status_text} (elapsed: {elapsed}s)")
+        # Heartbeat every 60 seconds while processing
+        if status == 2 and elapsed - last_heartbeat >= 60:
+            logger.info(f"🚀 正在渲染电影级大片，已耗时 {elapsed} 秒，请稍安勿躁...")
+            last_heartbeat = elapsed
 
         if status == 3:  # Completed
             logger.info(f"\n✅ Task completed!")
@@ -389,7 +402,7 @@ def wait_and_download(
                 filename = f"{task_id}_{i}{ext}"
                 output_path = output_dir / filename
 
-                logger.info(f"📥 Downloading video {i+1}/{len(urls)}: {output_path}")
+                logger.info(f"📥 Preparing download {i+1}/{len(urls)}")
                 if download_video(url, output_path):
                     downloaded_files.append({"file": str(output_path), "url": url})
                     # Save URL mapping

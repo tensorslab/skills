@@ -318,6 +318,8 @@ def wait_and_download(
     start_time = time.time()
 
     logger.info(f"⏳ Waiting for image generation to complete...")
+    last_status = None
+    last_status_log = -999999
 
     while time.time() - start_time < timeout:
         task_data = query_task_status(task_id, api_key)
@@ -330,7 +332,11 @@ def wait_and_download(
         status_text = IMAGE_STATUS.get(status, "Unknown")
 
         elapsed = int(time.time() - start_time)
-        logger.info(f"🔄 Status: {status_text} (elapsed: {elapsed}s)")
+        should_log_status = (status != last_status) or (elapsed - last_status_log >= 30)
+        if should_log_status:
+            logger.info(f"🔄 Status: {status_text} (elapsed: {elapsed}s)")
+            last_status = status
+            last_status_log = elapsed
 
         if status == 3:  # Completed
             logger.info(f"\n✅ Task completed!")
