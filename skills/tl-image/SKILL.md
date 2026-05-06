@@ -52,11 +52,12 @@ When the API key is provided via `export TENSORSLAB_API_KEY=xxx` or `--api-key` 
 | Model | Description | Best For |
 |-------|-------------|----------|
 | **seedreamv4** | Standard model (**Default**) | Fast generation, good quality |
-| **seedreamv5** | Latest enhanced model (**Generates slowly**) | General purpose, highest quality |
+| **seedreamv45** | Enhanced model | Higher quality than v4, faster than v5 |
+| **seedreamv5** | Seedream V5 Lite model (**Generates slowly**) | Highest quality, but slowest and most credits |
 | **zimage** | Alternative model | Specific artistic styles |
 | **quickedit** | Image instruction editing | Fast color/style/object editing |
 
-> **提示**：默认使用 **seedreamv4** 模型以保证生成速度。**seedreamv5** 质量更高但生成速度显著变慢且耗费更多积分。
+> **提示**：默认使用 **seedreamv4** 模型以保证生成速度。推荐使用 **seedreamv45** 获得更好的质量。注意 **seedreamv5** 实际为 **Seedream V5 Lite** 版本，质量最高但生成速度显著较慢且耗费更多积分。
 
 ## Workflow
 

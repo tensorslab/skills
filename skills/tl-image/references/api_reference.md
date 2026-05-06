@@ -38,15 +38,15 @@ All responses follow this structure:
 
 ### 1. Generate Image (SeeDream V4.5)
 
-**Endpoint:** `POST /v1/images/seedreamv5`
+**Endpoint:** `POST /v1/images/seedreamv45`
 
-**Recommended for:** General purpose, highest quality output
+**Recommended for:** Enhanced quality, faster than V5
 
 **Parameters (multipart/form-data):**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `category` | string | No | Default: "seedreamv5" |
+| `category` | string | No | Default: "seedreamv45" |
 | `prompt` | string | Yes | Text description of desired image |
 | `batchsize` | integer | No | Number of images (1-15), default: 1 |
 | `resolution` | string | No | Aspect ratio (9:16, 16:9, 3:4, 4:3, 1:1, 2:3, 3:2), level (2K, 4K), or WxH |
@@ -70,7 +70,27 @@ All responses follow this structure:
 }
 ```
 
-### 2. Generate Image (SeeDream V4)
+### 2. Generate Image (SeeDream V5 Lite)
+
+**Endpoint:** `POST /v1/images/seedreamv5`
+
+**Recommended for:** Highest quality output (note: this is the V5 Lite version)
+
+**Parameters (multipart/form-data):**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `category` | string | No | Default: "seedreamv5" |
+| `prompt` | string | Yes | Text description of desired image |
+| `batchsize` | integer | No | Number of images (1-15), default: 1 |
+| `resolution` | string | No | Aspect ratio (9:16, 16:9, 3:4, 4:3, 1:1, 2:3, 3:2), level (2K, 4K), or WxH |
+| `sourceImage` | file[] | No | Source images for image-to-image |
+| `imageUrl` | string | No | URL of source image for image-to-image |
+
+**Resolution constraints:**
+- Total pixels must be between 3,686,400 and 16,777,216
+
+### 3. Generate Image (SeeDream V4)
 
 **Endpoint:** `POST /v1/images/seedreamv4`
 
@@ -87,7 +107,7 @@ All responses follow this structure:
 | `sourceImage` | file[] | No | Source images |
 | `imageUrl` | string | No | Source image URL |
 
-### 3. Generate Image (Z-Image)
+### 4. Generate Image (Z-Image)
 
 **Endpoint:** `POST /v1/images/zimage`
 
@@ -102,7 +122,7 @@ All responses follow this structure:
 | `seed` | integer | No | Random seed for reproducibility |
 | `prompt_extend` | string | No | "1" to enable prompt enhancement |
 
-### 4. Query Task Status
+### 5. Query Task Status
 
 **Endpoint:** `POST /v1/images/infobytaskid`
 
@@ -144,7 +164,7 @@ All responses follow this structure:
 | 3 | Completed (url array contains results) |
 | 4 | Failed (check error_message field) |
 
-### 5. Delete Task
+### 6. Delete Task
 
 **Endpoint:** `POST /v1/images/deleteimagestask`
 
