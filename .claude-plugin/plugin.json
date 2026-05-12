@@ -16,6 +16,9 @@
     "image-to-image",
     "text-to-video",
     "image-to-video",
-    "ai"
+    "ai",
+    "aliyun",
+    "dashscope",
+    "happyhorse"
   ]
 }
