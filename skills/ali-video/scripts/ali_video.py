@@ -41,6 +41,7 @@ if SCRIPT_DIR not in sys.path:
 from ali_auth import (
     get_or_prompt_api_key,
     save_api_key_to_env,
+    AliAPIKeyError,
     DASHSCOPE_VIDEO_ENDPOINT,
     DASHSCOPE_TASK_ENDPOINT,
     DEFAULT_OUTPUT_DIR,
@@ -238,6 +239,13 @@ def generate_video(
         if response.status_code != 200:
             error_msg = result.get("message", "Unknown error")
             error_code = result.get("code", "Unknown")
+            # Detect auth failures
+            if response.status_code in (401, 403) or error_code in ("InvalidApiKey", "Forbidden"):
+                raise AliAPIKeyError(
+                    f"API key invalid or expired: {error_msg} (Code: {error_code}). "
+                    "Get a new key from https://bailian.console.aliyun.com/ "
+                    "and set via: export DASHSCOPE_API_KEY=your_key  or  --api-key YOUR_KEY"
+                )
             raise AliVideoAPIError(f"API error: {error_msg} (Code: {error_code})")
 
         task_id = result.get("output", {}).get("task_id")
@@ -520,6 +528,9 @@ Examples:
         if persisted_key:
             save_api_key_to_env(persisted_key)
 
+    except AliAPIKeyError as e:
+        logger.error(f"Error: {e}")
+        sys.exit(1)
     except AliVideoAPIError as e:
         logger.error(f"Error: {e}")
         sys.exit(1)

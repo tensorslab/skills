@@ -24,24 +24,15 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" <args>
 
 ## Authorization
 
-**BEFORE any video generation, you must ensure you have a DashScope API key.**
+The script automatically resolves the API key from `DASHSCOPE_API_KEY` environment variable or `.env` file at the skills directory. **Do NOT ask the user for an API key upfront.** Just run the script directly.
 
-### API Key Setup
-
-The script checks for `DASHSCOPE_API_KEY` in this order:
-1. `DASHSCOPE_API_KEY` environment variable
-2. `.env` file at the skills directory (sibling of ali-video folder)
-3. Exit with instructions if neither found
+If the script fails with an authentication error (invalid/expired key), THEN tell the user:
+1. Their API key is invalid or expired
+2. Get a new key from: https://bailian.console.aliyun.com/
+3. Set it via: `export DASHSCOPE_API_KEY=your_api_key_here`
+4. Or pass directly: `--api-key YOUR_KEY`
 
 *(Note: When you need to verify the environment variable, ONLY check if it exists. NEVER display or print the actual API key value.)*
-
-**To get your API key:**
-1. Go to https://bailian.console.aliyun.com/
-2. Create or find your API key
-3. Set it via:
-```bash
-export DASHSCOPE_API_KEY=your_api_key_here
-```
 
 After a successful generation, the API key is **automatically saved** to the `.env` file at the skills directory. Future sessions will pick it up without needing to export again.
 
@@ -205,7 +196,7 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a sunset timelapse" 
 
 | Scenario | User Message |
 |----------|--------------|
-| No API key | "Please set DASHSCOPE_API_KEY or get one from https://bailian.console.aliyun.com/" |
+| No API key / key invalid | "API key not found or invalid. Get a new key from https://bailian.console.aliyun.com/ and set via export or --api-key" |
 | Task failed | Show the specific error code and message from API |
 | Timeout | "Generation timed out after N seconds" |
 | Invalid parameters | Show validation error |

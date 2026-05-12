@@ -82,6 +82,11 @@ def save_api_key_to_env(api_key: str):
         logger.warning(f"[Warning] Failed to save API key to .env: {e}")
 
 
+class AliAPIKeyError(Exception):
+    """API key not found or invalid."""
+    pass
+
+
 def get_or_prompt_api_key() -> str:
     """
     Get API key from environment variable or .env file at skills directory.
@@ -89,7 +94,8 @@ def get_or_prompt_api_key() -> str:
     Returns:
         The API key.
 
-    Exits with error if no key is found and not running interactively.
+    Raises:
+        AliAPIKeyError if no key is found.
     """
     # First check environment variable
     api_key = os.environ.get("DASHSCOPE_API_KEY")
@@ -102,15 +108,11 @@ def get_or_prompt_api_key() -> str:
         os.environ["DASHSCOPE_API_KEY"] = api_key
         return api_key
 
-    logger.error("=" * 60)
-    logger.error("[!] DASHSCOPE_API_KEY not found.")
-    logger.error("[!] Please get your API key from:")
-    logger.error("[!]   https://bailian.console.aliyun.com/")
-    logger.error("[!] Then set it via:")
-    logger.error("[!]   export DASHSCOPE_API_KEY=your_api_key_here")
-    logger.error("[!] Or re-run this script with: --api-key YOUR_KEY")
-    logger.error("=" * 60)
-    sys.exit(1)
+    raise AliAPIKeyError(
+        "DASHSCOPE_API_KEY not found. "
+        "Get your key from https://bailian.console.aliyun.com/ "
+        "and set via: export DASHSCOPE_API_KEY=your_key  or  --api-key YOUR_KEY"
+    )
 
 
 if __name__ == "__main__":
