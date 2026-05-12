@@ -160,7 +160,7 @@ def generate_video(
         image_url: URL of first-frame image for I2V.
         reference_images: List of reference image URLs for R2V (1-9 images).
         seed: Random seed for reproducibility.
-        watermark: Whether to add watermark (default True).
+        watermark: Whether to add watermark (default False).
         api_key: DashScope API key (uses env var if not provided).
 
     Returns:
@@ -192,8 +192,7 @@ def generate_video(
     # Add optional parameters
     if seed is not None:
         body["parameters"]["seed"] = seed
-    if watermark:
-        body["parameters"]["watermark"] = True
+    body["parameters"]["watermark"] = watermark
 
     # Build input based on model
     if model == MODEL_T2V:

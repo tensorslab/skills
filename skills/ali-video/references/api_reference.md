@@ -109,7 +109,7 @@ Use `[Image N]` tags in prompt to reference images by their position in the medi
 | `resolution` | string | "720P", "1080P" | "1080P" | Yes | Yes | Yes |
 | `ratio` | string | "16:9", "9:16", "1:1", "4:3", "3:4" | "16:9" | Yes | No | Yes |
 | `duration` | int | 3-15 | 5 | Yes | Yes | Yes |
-| `watermark` | bool | true/false | true | Yes | Yes | Yes |
+| `watermark` | bool | true/false | false | Yes | Yes | Yes |
 | `seed` | int | 0-2147483647 | random | Yes | Yes | Yes |
 
 ## Task Status Flow
