@@ -13,9 +13,13 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# Shared user configurations
-USER_CONFIG_DIR = os.path.expanduser("~/.ali_video")
-ENV_FILE_PATH = os.path.join(USER_CONFIG_DIR, ".env")
+# Resolve paths relative to the skill directory
+# ali_auth.py is at skills/ali-video/scripts/ali_auth.py
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_SKILL_DIR = os.path.dirname(_SCRIPT_DIR)      # skills/ali-video/
+_SKILLS_DIR = os.path.dirname(_SKILL_DIR)       # skills/
+
+ENV_FILE_PATH = os.path.join(_SKILLS_DIR, ".env")
 DEFAULT_OUTPUT_DIR = Path(".") / "ali_output"
 
 # DashScope API constants
@@ -26,7 +30,7 @@ DASHSCOPE_TASK_ENDPOINT = f"{DASHSCOPE_API_BASE}/api/v1/tasks"
 
 def load_api_key_from_env() -> str | None:
     """
-    Load API key from ~/.ali_video/.env file.
+    Load API key from .env file at skills directory.
 
     Returns:
         The API key if found and valid (non-empty), None otherwise.
@@ -49,7 +53,7 @@ def load_api_key_from_env() -> str | None:
 
 
 def save_api_key_to_env(api_key: str):
-    """Save API key to ~/.ali_video/.env for future sessions."""
+    """Save API key to .env file at skills directory for future sessions."""
     try:
         os.makedirs(os.path.dirname(ENV_FILE_PATH), exist_ok=True)
 
@@ -80,7 +84,7 @@ def save_api_key_to_env(api_key: str):
 
 def get_or_prompt_api_key() -> str:
     """
-    Get API key from environment variable or ~/.ali_video/.env file.
+    Get API key from environment variable or .env file at skills directory.
 
     Returns:
         The API key.

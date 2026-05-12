@@ -145,7 +145,7 @@ def generate_video(
     image_url: Optional[str] = None,
     reference_images: Optional[List[str]] = None,
     seed: Optional[int] = None,
-    watermark: bool = True,
+    watermark: bool = False,
     api_key: Optional[str] = None,
 ) -> str:
     """
@@ -192,8 +192,8 @@ def generate_video(
     # Add optional parameters
     if seed is not None:
         body["parameters"]["seed"] = seed
-    if not watermark:
-        body["parameters"]["watermark"] = False
+    if watermark:
+        body["parameters"]["watermark"] = True
 
     # Build input based on model
     if model == MODEL_T2V:
@@ -429,8 +429,8 @@ Examples:
     parser.add_argument("--reference-image", action="append", dest="reference_images",
                         help="Reference image URL for R2V mode (can specify 1-9 times)")
     parser.add_argument("--seed", type=int, help="Random seed for reproducibility")
-    parser.add_argument("--no-watermark", action="store_true",
-                        help="Disable watermark (default: watermark enabled)")
+    parser.add_argument("--watermark", action="store_true",
+                        help="Enable watermark (default: watermark disabled)")
     parser.add_argument("--api-key", help="DashScope API key (uses DASHSCOPE_API_KEY env var if not set)")
     parser.add_argument("--poll-interval", type=int, default=15,
                         help="Status check interval in seconds (default: 15)")
@@ -488,7 +488,7 @@ Examples:
             image_url=args.image_url,
             reference_images=args.reference_images,
             seed=args.seed,
-            watermark=not args.no_watermark,
+            watermark=args.watermark,
             api_key=args.api_key,
         )
 

@@ -30,7 +30,7 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" <args>
 
 The script checks for `DASHSCOPE_API_KEY` in this order:
 1. `DASHSCOPE_API_KEY` environment variable
-2. `~/.ali_video/.env` file
+2. `.env` file at the skills directory (sibling of ali-video folder)
 3. Exit with instructions if neither found
 
 *(Note: When you need to verify the environment variable, ONLY check if it exists. NEVER display or print the actual API key value.)*
@@ -43,7 +43,7 @@ The script checks for `DASHSCOPE_API_KEY` in this order:
 export DASHSCOPE_API_KEY=your_api_key_here
 ```
 
-After a successful generation, the API key is **automatically saved** to `~/.ali_video/.env`. Future sessions will pick it up without needing to export again.
+After a successful generation, the API key is **automatically saved** to the `.env` file at the skills directory. Future sessions will pick it up without needing to export again.
 
 ## Models
 
@@ -185,7 +185,7 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "[Image 1] girl in dr
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "epic mountain timelapse" --resolution 1080P --duration 10
 
 # Without watermark
-python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "abstract flowing colors" --no-watermark
+python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "abstract flowing colors" --watermark
 
 # Custom output directory
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a sunset timelapse" --output-dir ./my_videos
