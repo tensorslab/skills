@@ -7,3 +7,6 @@ api-reference
 *.webm
 *.zip
 .claude/settings.local.json
+.env
+.playwright-mcp
+ali_output
