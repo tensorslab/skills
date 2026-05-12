@@ -175,8 +175,8 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "[Image 1] girl in dr
 # High quality 1080P
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "epic mountain timelapse" --resolution 1080P --duration 10
 
-# Without watermark
-python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "abstract flowing colors" --watermark
+# With watermark
+python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "abstract flowing colors" --watermark true
 
 # Custom output directory
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a sunset timelapse" --output-dir ./my_videos

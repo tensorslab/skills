@@ -220,6 +220,7 @@ def generate_video(
         logger.info(f"Generating video using {model}...")
         logger.info(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
         logger.info(f"Settings: {ratio} @ {resolution}, {duration}s")
+        print(f"body:{body}")
 
         response = _SESSION.post(
             DASHSCOPE_VIDEO_ENDPOINT,
@@ -436,8 +437,8 @@ Examples:
     parser.add_argument("--reference-image", action="append", dest="reference_images",
                         help="Reference image URL for R2V mode (can specify 1-9 times)")
     parser.add_argument("--seed", type=int, help="Random seed for reproducibility")
-    parser.add_argument("--watermark", action="store_true",
-                        help="Enable watermark (default: watermark disabled)")
+    parser.add_argument("--watermark", type=str, choices=["true", "false"], default="false",
+                        help="Enable watermark: true/false (default: false)")
     parser.add_argument("--api-key", help="DashScope API key (uses DASHSCOPE_API_KEY env var if not set)")
     parser.add_argument("--poll-interval", type=int, default=15,
                         help="Status check interval in seconds (default: 15)")
@@ -495,7 +496,7 @@ Examples:
             image_url=args.image_url,
             reference_images=args.reference_images,
             seed=args.seed,
-            watermark=args.watermark,
+            watermark=args.watermark == "true",
             api_key=args.api_key,
         )
 
