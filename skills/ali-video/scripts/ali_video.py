@@ -39,7 +39,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-from ali_auth import (
+from ali_auth import (  # noqa: E402
     get_or_prompt_api_key,
     save_api_key_to_env,
     AliAPIKeyError,
@@ -227,6 +227,7 @@ def generate_video(
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
         "X-DashScope-Async": "enable",
+        "X-DashScope-DataInspection": '{"input":"disable","output":"disable"}',
     }
 
     # Build request body
@@ -448,7 +449,16 @@ def wait_and_download(
 
         time.sleep(poll_interval)
 
-    raise AliVideoAPIError(f"Timeout waiting for task completion (waited {timeout}s)")
+    elapsed = int(time.time() - start_time)
+    msg = (
+        f"Timeout waiting for task completion (waited {timeout}s).\n"
+        f"Task ID: {task_id}\n"
+        f"Use the query script to check status later:\n"
+        f"  python ali_query_task.py {task_id}"
+    )
+    logger.error(msg)
+    print(json.dumps({"ok": False, "error": "timeout", "task_id": task_id, "elapsed": elapsed}, ensure_ascii=False))
+    raise AliVideoAPIError(msg)
 
 
 def main():

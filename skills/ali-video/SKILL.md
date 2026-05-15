@@ -16,6 +16,7 @@ The Python scripts for this skill are located in the `scripts/` subdirectory rel
 For example, if this SKILL.md is at `/path/to/skills/ali-video/SKILL.md`, then:
 - Auth script: `python "/path/to/skills/ali-video/scripts/ali_auth.py"`
 - Video script: `python "/path/to/skills/ali-video/scripts/ali_video.py"`
+- Query script: `python "/path/to/skills/ali-video/scripts/ali_query_task.py"`
 
 When executing, construct the command using the resolved absolute path:
 ```bash
@@ -193,6 +194,29 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "abstract flowing col
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a sunset timelapse" --output-dir ./my_videos
 ```
 
+## Querying Task Status After Timeout
+
+If video generation times out, the script prints the task ID and suggests using the query script. To check status or download a completed task later:
+
+```bash
+# Poll and wait for completion (default 120s), auto-download on success
+python "<absolute_path_to_skill_dir>/scripts/ali_query_task.py" TASK_ID
+
+# Wait longer (e.g. 10 minutes)
+python "<absolute_path_to_skill_dir>/scripts/ali_query_task.py" TASK_ID --wait 600
+
+# Poll with custom interval and output directory
+python "<absolute_path_to_skill_dir>/scripts/ali_query_task.py" TASK_ID --wait 600 --poll-interval 15 --output-dir ./my_videos
+
+# Single query, just check status (no waiting)
+python "<absolute_path_to_skill_dir>/scripts/ali_query_task.py" TASK_ID --wait 0
+
+# Single query + download if already succeeded
+python "<absolute_path_to_skill_dir>/scripts/ali_query_task.py" TASK_ID --wait 0 --download
+```
+
+The script polls until the task reaches a terminal state (SUCCEEDED/FAILED/UNKNOWN) or the timeout expires. `--wait` defaults to 120 seconds; pass `--wait 0` for a single query. On success it auto-downloads the video. On timeout it prints the task ID again so the agent can retry.
+
 ## Task Status Flow
 
 | Status | Meaning |
@@ -209,7 +233,7 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a sunset timelapse" 
 |----------|--------------|
 | No API key / key invalid | "API key not found or invalid. Get a new key from https://bailian.console.aliyun.com/ and set via --api-key" |
 | Task failed | Show the specific error code and message from API |
-| Timeout | "Generation timed out after N seconds" |
+| Timeout | "Generation timed out after N seconds. Task ID: xxx. Use query script to check later: python ali_query_task.py xxx" |
 | Invalid parameters | Show validation error |
 
 ## Output
@@ -251,6 +275,7 @@ Video generation complete!
 ## Resources
 
 - **scripts/ali_video.py**: Main API client with full CLI support
+- **scripts/ali_query_task.py**: Standalone task query/download script (use after timeout)
 - **scripts/ali_auth.py**: API key management module
 - **references/api_reference.md**: Detailed DashScope HappyHorse API documentation
 - **DashScope Console**: https://bailian.console.aliyun.com/
