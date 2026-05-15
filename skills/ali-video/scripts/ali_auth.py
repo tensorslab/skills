@@ -3,7 +3,7 @@
 Aliyun DashScope API Key Management Module
 
 Manages DASHSCOPE_API_KEY for Aliyun Bailian video generation.
-No browser OAuth - simple env var or file-based key management.
+Reads and writes key exclusively from/to the .env file at the skills directory.
 """
 
 import os
@@ -89,7 +89,7 @@ class AliAPIKeyError(Exception):
 
 def get_or_prompt_api_key() -> str:
     """
-    Get API key from environment variable or .env file at skills directory.
+    Get API key from .env file at skills directory.
 
     Returns:
         The API key.
@@ -97,21 +97,14 @@ def get_or_prompt_api_key() -> str:
     Raises:
         AliAPIKeyError if no key is found.
     """
-    # First check environment variable
-    api_key = os.environ.get("DASHSCOPE_API_KEY")
-    if api_key:
-        return api_key
-
-    # Then check .env file
     api_key = load_api_key_from_env()
     if api_key:
-        os.environ["DASHSCOPE_API_KEY"] = api_key
         return api_key
 
     raise AliAPIKeyError(
         "DASHSCOPE_API_KEY not found. "
         "Get your key from https://bailian.console.aliyun.com/ "
-        "and set via: export DASHSCOPE_API_KEY=your_key  or  --api-key YOUR_KEY"
+        "and set via: --api-key YOUR_KEY"
     )
 
 

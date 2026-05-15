@@ -20,6 +20,8 @@ Authorization: Bearer $DASHSCOPE_API_KEY
 
 Get your API key from: https://bailian.console.aliyun.com/
 
+The API key is stored in the `.env` file at the skills directory (not environment variables).
+
 ## Endpoints
 
 ### Submit Task
@@ -172,10 +174,13 @@ PENDING -> RUNNING -> SUCCEEDED
 
 ### I2V First Frame
 - Formats: JPEG, JPG, PNG, WEBP
-- Min resolution: 300x300
+- Min resolution: 300x300 (width and height each >= 300px)
 - Aspect ratio: 1:2.5 to 2.5:1
 - Max file size: 20MB
-- Supports URL or base64 data URL
+- Input formats:
+  - Public URL (HTTP/HTTPS): `https://example.com/image.png`
+  - Base64 data URL: `data:{MIME_type};base64,{base64_data}`
+    - Example: `data:image/png;base64,iVBORw0KGgo...`
 
 ### R2V Reference Images
 - 1-9 images
@@ -193,6 +198,10 @@ PENDING -> RUNNING -> SUCCEEDED
 
 - 5s video: ~1-2 minutes
 - 10s video: ~2-4 minutes
-- 15s video: ~3-5 minutes
+- 15s video: ~5+ minutes
 
 Recommended polling interval: 15 seconds.
+
+
+## doc url
+https://www.alibabacloud.com/help/zh/model-studio/happyhorse-text-to-video-api-reference

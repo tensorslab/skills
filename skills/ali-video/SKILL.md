@@ -24,17 +24,14 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" <args>
 
 ## Authorization
 
-The script automatically resolves the API key from `DASHSCOPE_API_KEY` environment variable or `.env` file at the skills directory. **Do NOT ask the user for an API key upfront.** Just run the script directly.
+The script reads the API key from the `.env` file at the skills directory. **Do NOT ask the user for an API key upfront.** Just run the script directly.
 
 If the script fails with an authentication error (invalid/expired key), THEN tell the user:
 1. Their API key is invalid or expired
 2. Get a new key from: https://bailian.console.aliyun.com/
-3. Set it via: `export DASHSCOPE_API_KEY=your_api_key_here`
-4. Or pass directly: `--api-key YOUR_KEY`
+3. Pass directly: `--api-key YOUR_KEY`
 
-*(Note: When you need to verify the environment variable, ONLY check if it exists. NEVER display or print the actual API key value.)*
-
-After a successful generation, the API key is **automatically saved** to the `.env` file at the skills directory. Future sessions will pick it up without needing to export again.
+The key passed via `--api-key` is **automatically saved** to the `.env` file at the skills directory. Future sessions will pick it up without needing to pass the key again.
 
 ## Models
 
@@ -80,14 +77,17 @@ User request: "让这张人物合影 family.jpg 动起来" or "让风景照动�
 4. Download results
 
 **Parameters for I2V:**
-- `--image-url`: URL of the first-frame image (required for I2V)
+- `--image-url`: First-frame image (required for I2V). Supports three formats:
+  - Public URL: `https://example.com/image.png`
+  - Base64 data URL: `data:image/png;base64,iVBORw0KGgo...`
+  - Local file path: `./my_image.jpg` (auto-converted to base64)
 - Prompt: Optional text describing desired motion/animation
 
 **Note:** I2V does not support `--ratio`. Output aspect ratio matches the input image.
 
 **Image constraints:**
-- Formats: JPEG, PNG, WEBP
-- Min resolution: 300x300
+- Formats: JPEG, JPG, PNG, WEBP
+- Min resolution: 300x300 (width and height each >= 300px)
 - Aspect ratio: 1:2.5 to 2.5:1
 - Max size: 20MB
 
@@ -102,7 +102,10 @@ User request: "用这几张参考图生成一段视频" or "根据参考人物�
 4. Download results
 
 **Parameters for R2V:**
-- `--reference-image`: Use multiple times for multiple images (1-9)
+- `--reference-image`: Reference images (1-9). Each supports:
+  - Public URL: `https://example.com/image.jpg`
+  - Base64 data URL: `data:image/jpeg;base64,...`
+  - Local file path: `./ref.jpg` (auto-converted to base64)
 - Prompt: Must use `[Image N]` tags to reference images
 
 **Example prompt:**
@@ -137,11 +140,16 @@ User request: "用这几张参考图生成一段视频" or "根据参考人物�
 
 ## Progress Tracking
 
-Video generation takes **1-5 minutes**. Keep users informed:
+Video generation times vary by duration:
+- **5s video:** ~1-2 minutes
+- **10s video:** ~2-4 minutes
+- **15s video:** ~5+ minutes
+
+Keep users informed:
 
 ```
 Waiting for video generation to complete...
-   (This may take 1-5 minutes - please be patient)
+   (This may take 1-5 minutes, longer for 15s videos - please be patient)
 Status: RUNNING (elapsed: 45s)
 Video rendering in progress, elapsed 60s, please wait...
 Video rendering in progress, elapsed 120s, please wait...
@@ -168,6 +176,9 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "sunset over ocean wa
 
 # Image-to-video (I2V) with first-frame URL
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a cat running on grass" --model i2v --image-url https://example.com/cat.jpg
+
+# I2V with local image file (auto-converted to base64)
+python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "gentle waves" --model i2v --image-url ./my_photo.png
 
 # Reference-to-video (R2V) with multiple images
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "[Image 1] girl in dress holding [Image 2] fan" --model r2v --reference-image https://example.com/girl.jpg --reference-image https://example.com/fan.jpg
@@ -196,7 +207,7 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a sunset timelapse" 
 
 | Scenario | User Message |
 |----------|--------------|
-| No API key / key invalid | "API key not found or invalid. Get a new key from https://bailian.console.aliyun.com/ and set via export or --api-key" |
+| No API key / key invalid | "API key not found or invalid. Get a new key from https://bailian.console.aliyun.com/ and set via --api-key" |
 | Task failed | Show the specific error code and message from API |
 | Timeout | "Generation timed out after N seconds" |
 | Invalid parameters | Show validation error |

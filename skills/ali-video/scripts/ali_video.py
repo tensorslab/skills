@@ -14,6 +14,7 @@ import os
 import sys
 import time
 import json
+import base64
 import argparse
 import logging
 from pathlib import Path
@@ -72,6 +73,58 @@ MODEL_I2V = "happyhorse-1.0-i2v"
 MODEL_R2V = "happyhorse-1.0-r2v"
 
 ALL_MODELS = [MODEL_T2V, MODEL_I2V, MODEL_R2V]
+
+# Supported image formats and their MIME types
+_IMAGE_MIME_MAP = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".webp": "image/webp",
+}
+
+
+def resolve_image_input(image_input: str) -> str:
+    """
+    Resolve image input to a URL or base64 data URL.
+
+    Accepts:
+      - HTTP/HTTPS URL (returned as-is)
+      - Base64 data URL (data:image/...;base64,...) (returned as-is)
+      - Local file path (converted to base64 data URL)
+
+    Returns:
+        A URL or data URL string suitable for the API.
+    """
+    # Already a URL
+    if image_input.startswith("http://") or image_input.startswith("https://"):
+        return image_input
+
+    # Already a base64 data URL
+    if image_input.startswith("data:"):
+        return image_input
+
+    # Treat as local file path
+    file_path = Path(image_input).expanduser().resolve()
+
+    if not file_path.exists():
+        raise AliVideoAPIError(f"Image file not found: {image_input}")
+
+    ext = file_path.suffix.lower()
+    mime_type = _IMAGE_MIME_MAP.get(ext)
+    if not mime_type:
+        raise AliVideoAPIError(
+            f"Unsupported image format: {ext}. Supported: {', '.join(_IMAGE_MIME_MAP.keys())}"
+        )
+
+    file_size = file_path.stat().st_size
+    if file_size > 20 * 1024 * 1024:
+        raise AliVideoAPIError(f"Image file too large: {file_size / (1024*1024):.1f}MB (max 20MB)")
+
+    with open(file_path, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode("utf-8")
+
+    logger.info(f"Converted local image to base64: {file_path.name} ({file_size / 1024:.0f}KB)")
+    return f"data:{mime_type};base64,{encoded}"
 
 
 def ensure_output_dir(output_dir: Path):
@@ -202,9 +255,10 @@ def generate_video(
     elif model == MODEL_I2V:
         if not image_url:
             raise AliVideoAPIError("I2V model requires --image-url parameter")
+        resolved_url = resolve_image_input(image_url)
         body["input"]["prompt"] = prompt
         body["input"]["media"] = [
-            {"type": "first_frame", "url": image_url}
+            {"type": "first_frame", "url": resolved_url}
         ]
 
     elif model == MODEL_R2V:
@@ -212,7 +266,7 @@ def generate_video(
             raise AliVideoAPIError("R2V model requires at least one --reference-image URL")
         body["input"]["prompt"] = prompt
         body["input"]["media"] = [
-            {"type": "reference_image", "url": url}
+            {"type": "reference_image", "url": resolve_image_input(url)}
             for url in reference_images[:9]
         ]
 
@@ -245,7 +299,7 @@ def generate_video(
                 raise AliAPIKeyError(
                     f"API key invalid or expired: {error_msg} (Code: {error_code}). "
                     "Get a new key from https://bailian.console.aliyun.com/ "
-                    "and set via: export DASHSCOPE_API_KEY=your_key  or  --api-key YOUR_KEY"
+                    "and set via: --api-key YOUR_KEY"
                 )
             raise AliVideoAPIError(f"API error: {error_msg} (Code: {error_code})")
 
@@ -334,7 +388,7 @@ def wait_and_download(
     start_time = time.time()
 
     logger.info("Waiting for video generation to complete...")
-    logger.info("   (This may take 1-5 minutes - please be patient)")
+    logger.info("   (This may take 1-5 minutes, longer for 15s videos - please be patient)")
 
     last_heartbeat = 0
     last_status = None
@@ -433,13 +487,13 @@ Examples:
     parser.add_argument("--resolution", choices=["720P", "1080P"],
                         default="720P", help="Video resolution (default: 720P)")
     parser.add_argument("--image-url",
-                        help="Source image URL for I2V mode (first-frame image)")
+                        help="Image for I2V first frame: URL, base64 data URL, or local file path")
     parser.add_argument("--reference-image", action="append", dest="reference_images",
-                        help="Reference image URL for R2V mode (can specify 1-9 times)")
+                        help="Reference image for R2V: URL, base64 data URL, or local file path (can specify 1-9 times)")
     parser.add_argument("--seed", type=int, help="Random seed for reproducibility")
     parser.add_argument("--watermark", type=str, choices=["true", "false"], default="false",
                         help="Enable watermark: true/false (default: false)")
-    parser.add_argument("--api-key", help="DashScope API key (uses DASHSCOPE_API_KEY env var if not set)")
+    parser.add_argument("--api-key", help="DashScope API key (saved to .env file for future use)")
     parser.add_argument("--poll-interval", type=int, default=15,
                         help="Status check interval in seconds (default: 15)")
     parser.add_argument("--timeout", type=int, default=1800,
@@ -524,10 +578,9 @@ Examples:
             )
         )
 
-        # Persist API key to ~/.ali_video/.env for future sessions
-        persisted_key = args.api_key or os.environ.get("DASHSCOPE_API_KEY")
-        if persisted_key:
-            save_api_key_to_env(persisted_key)
+        # Persist API key to .env for future sessions
+        if args.api_key:
+            save_api_key_to_env(args.api_key)
 
     except AliAPIKeyError as e:
         logger.error(f"Error: {e}")
