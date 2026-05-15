@@ -274,7 +274,6 @@ def generate_video(
         logger.info(f"Generating video using {model}...")
         logger.info(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
         logger.info(f"Settings: {ratio} @ {resolution}, {duration}s")
-        print(f"body:{body}")
 
         response = _SESSION.post(
             DASHSCOPE_VIDEO_ENDPOINT,
