@@ -178,6 +178,9 @@ def generate_image(
         endpoint = f"{API_BASE_URL}/v1/images/seedreamv45"
     elif model == "quickedit":
         endpoint = f"{API_BASE_URL}/v1/images/quickedit"
+        # quickedit 服务端期望 ratio 字段而非 resolution
+        files = [(k, v) for k, v in files if k != "resolution"]
+        files.append(("ratio", (None, resolution)))
     else:  # seedreamv5
         if model == "seedreamv5":
             logger.info("⚠️ 注意：seedreamv5 (Lite) 模型生成质量更高，但速度显著较慢，请耐心等待。")

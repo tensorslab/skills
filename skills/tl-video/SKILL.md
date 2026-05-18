@@ -151,6 +151,16 @@ Video generation takes **several minutes**. Keep users informed:
 > pip install requests pyyaml
 > ```
 
+**重要：提示词必须用引号包裹。** 传给脚本的 prompt 参数必须用双引号 `"` 包裹，避免 shell 解析问题：
+```bash
+# 正确
+python "scripts/tensorslab_video.py" "a spaceship flying through space"
+python "scripts/tensorslab_video.py" "让照片中的人物动起来" --source portrait.jpg
+
+# 错误 - 提示词没有引号
+python "scripts/tensorslab_video.py" a spaceship flying through space
+```
+
 Execute the Python script directly:
 
 ```bash
