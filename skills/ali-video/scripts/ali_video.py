@@ -199,7 +199,6 @@ def generate_video(
     image_url: Optional[str] = None,
     reference_images: Optional[List[str]] = None,
     seed: Optional[int] = None,
-    watermark: bool = False,
     api_key: Optional[str] = None,
 ) -> str:
     """
@@ -214,7 +213,6 @@ def generate_video(
         image_url: URL of first-frame image for I2V.
         reference_images: List of reference image URLs for R2V (1-9 images).
         seed: Random seed for reproducibility.
-        watermark: Whether to add watermark (default False).
         api_key: DashScope API key (uses env var if not provided).
 
     Returns:
@@ -247,7 +245,7 @@ def generate_video(
     # Add optional parameters
     if seed is not None:
         body["parameters"]["seed"] = seed
-    body["parameters"]["watermark"] = watermark
+    body["parameters"]["watermark"] = False
 
     # Build input based on model
     if model == MODEL_T2V:
@@ -484,7 +482,9 @@ Examples:
         """
     )
 
-    parser.add_argument("prompt", help="Text prompt for video generation")
+    parser.add_argument("prompt", nargs="?", default=None, help="Text prompt for video generation (optional if --prompt-file is used)")
+    parser.add_argument("--prompt-file", type=str, default=None,
+                        help="Read prompt from a text file (UTF-8). When used, the positional prompt argument can be omitted.")
     parser.add_argument("--model", "-m",
                         choices=["t2v", "i2v", "r2v"],
                         default="t2v",
@@ -500,8 +500,6 @@ Examples:
     parser.add_argument("--reference-image", action="append", dest="reference_images",
                         help="Reference image for R2V: URL, base64 data URL, or local file path (can specify 1-9 times)")
     parser.add_argument("--seed", type=int, help="Random seed for reproducibility")
-    parser.add_argument("--watermark", type=str, choices=["true", "false"], default="false",
-                        help="Enable watermark: true/false (default: false)")
     parser.add_argument("--api-key", help="DashScope API key (saved to .env file for future use)")
     parser.add_argument("--poll-interval", type=int, default=15,
                         help="Status check interval in seconds (default: 15)")
@@ -548,10 +546,28 @@ Examples:
         logger.error("Error: maximum 9 reference images allowed for R2V")
         sys.exit(1)
 
+    # Resolve prompt: from --prompt-file or positional argument
+    prompt_text = args.prompt
+    if args.prompt_file:
+        prompt_path = Path(args.prompt_file).expanduser().resolve()
+        if not prompt_path.exists():
+            logger.error(f"Error: prompt file not found: {args.prompt_file}")
+            sys.exit(1)
+        try:
+            prompt_text = prompt_path.read_text(encoding="utf-8").strip()
+        except Exception as e:
+            logger.error(f"Error reading prompt file: {e}")
+            sys.exit(1)
+        logger.info(f"Loaded prompt from file: {prompt_path} ({len(prompt_text)} chars)")
+
+    if not prompt_text:
+        logger.error("Error: prompt is required. Provide it as a positional argument or via --prompt-file.")
+        sys.exit(1)
+
     try:
         # Generate video
         task_id = generate_video(
-            prompt=args.prompt,
+            prompt=prompt_text,
             model=model_id,
             ratio=args.ratio,
             duration=args.duration,
@@ -559,7 +575,6 @@ Examples:
             image_url=args.image_url,
             reference_images=args.reference_images,
             seed=args.seed,
-            watermark=args.watermark == "true",
             api_key=args.api_key,
         )
 

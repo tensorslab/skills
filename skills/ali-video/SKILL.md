@@ -1,6 +1,6 @@
 ---
 name: ali-video
-description: Generate videos using Aliyun Bailian's HappyHorse AI video generation models via DashScope API. Supports text-to-video (T2V), image-to-video (I2V with first frame), and reference-to-video (R2V with multiple reference images). Requires DASHSCOPE_API_KEY. Video generation typically takes 1-5 minutes.
+description: Generate videos using Aliyun Bailian's HappyHorse AI video generation models via DashScope API. Supports text-to-video (T2V), image-to-video (I2V with first frame), and reference-to-video (R2V with multiple reference images). Supports batch generation with concurrent task execution. Requires DASHSCOPE_API_KEY. Video generation typically takes 1-5 minutes. MUST use this skill whenever generating videos with Aliyun/HappyHorse/DashScope, including batch video generation, animating images, or creating videos from text descriptions.
 ---
 
 # Aliyun Bailian Video Generation (HappyHorse)
@@ -8,6 +8,10 @@ description: Generate videos using Aliyun Bailian's HappyHorse AI video generati
 ## Overview
 
 This skill enables AI-powered video generation through Aliyun Bailian's DashScope API using HappyHorse models. Three generation modes are supported: text-to-video, image-to-video (first-frame based), and reference-to-video (multiple reference images). Video generation typically takes 1-5 minutes.
+
+## Critical: Always Use the Bundled Script
+
+**The `ali_video.py` script in the `scripts/` directory is the only correct way to generate videos with this skill.** Never write temporary scripts or call the DashScope API directly — the bundled script handles authentication, base64 conversion, error handling, and watermark-free output correctly. Writing ad-hoc scripts will produce videos with watermarks or other issues.
 
 ## Script Path
 
@@ -159,6 +163,49 @@ Task completed!
 
 **Heartbeat interval:** Print encouraging message every 60 seconds.
 
+## Batch Video Generation
+
+When generating multiple videos at once (e.g., a series of product videos, multiple scenes), follow this batch workflow to run generation tasks concurrently.
+
+### File Naming Convention
+
+For batch generation, prepare reference images and prompt files with **sequential number prefixes** so they can be correctly paired:
+
+```
+batch_input/
+├── 01_image.jpg        # Reference image for task #1
+├── 01_prompt.txt       # Prompt for task #1
+├── 02_image.jpg        # Reference image for task #2
+├── 02_prompt.txt       # Prompt for task #2
+├── 03_image.jpg        # Reference image for task #3
+├── 03_prompt.txt       # Prompt for task #3
+```
+
+The number prefix (e.g., `01_`, `02_`) establishes the pairing. **Image and prompt files with the same prefix must correspond to the same video.** This correspondence must never be wrong.
+
+### Batch Execution
+
+Launch each task as a separate `ali_video.py` invocation **concurrently** (in parallel). Use `--prompt-file` to read the prompt from the corresponding text file:
+
+```bash
+# Launch all tasks in parallel (each in background)
+python "<skill_dir>/scripts/ali_video.py" --prompt-file ./batch_input/01_prompt.txt --model i2v --image-url ./batch_input/01_image.jpg --output-dir ./batch_output &
+
+python "<skill_dir>/scripts/ali_video.py" --prompt-file ./batch_input/02_prompt.txt --model i2v --image-url ./batch_input/02_image.jpg --output-dir ./batch_output &
+
+python "<skill_dir>/scripts/ali_video.py" --prompt-file ./batch_input/03_prompt.txt --model i2v --image-url ./batch_input/03_image.jpg --output-dir ./batch_output &
+
+wait  # Wait for all background tasks to complete
+```
+
+### Batch Rules
+
+1. **Sequential number prefixes** — Files must be named starting with `01_`, `02_`, `03_`, etc. Zero-padded numbers ensure correct sorting.
+2. **Strict pairing** — The Nth image file and Nth prompt file (by number prefix) are always paired together. Never mix up the order.
+3. **Concurrent execution** — All tasks should be launched in parallel to maximize throughput. The DashScope API handles queuing.
+4. **Shared output directory** — Use a common `--output-dir` for the batch so all results land in one place. Each task's output file is named by task ID, so there's no collision.
+5. **Always use `ali_video.py`** — Never write temporary scripts for batch generation. Call `ali_video.py` once per task, using `--prompt-file` to load the prompt from the paired text file.
+
 ## Using the Script
 
 > **Dependencies:** The script requires `requests` and `pyyaml` libraries. Install before first use:
@@ -187,8 +234,8 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "[Image 1] girl in dr
 # High quality 1080P
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "epic mountain timelapse" --resolution 1080P --duration 10
 
-# With watermark
-python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "abstract flowing colors" --watermark true
+# Read prompt from file (useful for long prompts or batch generation)
+python "<absolute_path_to_skill_dir>/scripts/ali_video.py" --prompt-file ./prompt.txt --model i2v --image-url ./photo.jpg
 
 # Custom output directory
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a sunset timelapse" --output-dir ./my_videos
