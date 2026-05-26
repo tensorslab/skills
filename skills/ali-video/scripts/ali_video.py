@@ -88,9 +88,10 @@ def resolve_image_input(image_input: str) -> str:
     Resolve image input to a URL or base64 data URL.
 
     Accepts:
+      - Local file path (preferred, converted to base64 data URL)
       - HTTP/HTTPS URL (returned as-is)
-      - Base64 data URL (data:image/...;base64,...) (returned as-is)
-      - Local file path (converted to base64 data URL)
+
+    Do NOT upload images to free image hosting sites to get a URL.
 
     Returns:
         A URL or data URL string suitable for the API.
@@ -105,6 +106,18 @@ def resolve_image_input(image_input: str) -> str:
 
     # Treat as local file path
     file_path = Path(image_input).expanduser().resolve()
+
+    # Validate suspicious Windows-style paths like /c/xx or /d/xx
+    # These are likely mistakes (e.g., /c/Users/... instead of C:/Users/...)
+    path_str = str(file_path)
+    if os.name == "nt" and len(path_str) >= 3 and path_str[0] == "/" and path_str[2] == "/":
+        drive_letter = path_str[1].upper()
+        if drive_letter.isalpha():
+            raise AliVideoAPIError(
+                f"Suspicious path format: '{image_input}'. "
+                f"If this is a Windows path, use '{drive_letter}:{path_str[2:]}' instead "
+                f"(e.g., 'C:/Users/...' not '/c/Users/...')."
+            )
 
     if not file_path.exists():
         raise AliVideoAPIError(f"Image file not found: {image_input}")
@@ -210,8 +223,8 @@ def generate_video(
         ratio: Video aspect ratio (16:9, 9:16, 1:1, 4:3, 3:4). Not supported by I2V.
         duration: Video duration in seconds (3-15, default 5).
         resolution: Video resolution (720P or 1080P, default 720P).
-        image_url: URL of first-frame image for I2V.
-        reference_images: List of reference image URLs for R2V (1-9 images).
+        image_url: Path or URL of first-frame image for I2V. Prefer local file paths.
+        reference_images: List of reference image paths/URLs for R2V (1-9 images).
         seed: Random seed for reproducibility.
         api_key: DashScope API key (uses env var if not provided).
 
@@ -225,7 +238,6 @@ def generate_video(
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
         "X-DashScope-Async": "enable",
-        "X-DashScope-DataInspection": '{"input":"disable","output":"disable"}',
     }
 
     # Build request body
@@ -253,7 +265,7 @@ def generate_video(
 
     elif model == MODEL_I2V:
         if not image_url:
-            raise AliVideoAPIError("I2V model requires --image-url parameter")
+            raise AliVideoAPIError("I2V model requires --image-path parameter")
         resolved_url = resolve_image_input(image_url)
         body["input"]["prompt"] = prompt
         body["input"]["media"] = [
@@ -471,11 +483,11 @@ Examples:
   # Specify duration and aspect ratio
   python ali_video.py "sunset over ocean waves" --duration 10 --ratio 16:9
 
-  # Image-to-video (I2V) with first-frame image URL
-  python ali_video.py "a cat running on grass" --model i2v --image-url https://example.com/cat.jpg
+  # Image-to-video (I2V) with local image path (preferred)
+  python ali_video.py "a cat running on grass" --model i2v --image-path C:/photos/cat.jpg
 
   # Reference-to-video (R2V) with multiple reference images
-  python ali_video.py "[Image 1] girl in red dress holding [Image 2] fan" --model r2v --reference-image https://example.com/girl.jpg --reference-image https://example.com/fan.jpg
+  python ali_video.py "[Image 1] girl in red dress holding [Image 2] fan" --model r2v --reference-image C:/photos/girl.jpg --reference-image C:/photos/fan.jpg
 
   # High quality 1080P
   python ali_video.py "epic mountain timelapse" --resolution 1080P --duration 10
@@ -495,10 +507,12 @@ Examples:
                         help="Video duration in seconds (3-15, default: 5)")
     parser.add_argument("--resolution", choices=["720P", "1080P"],
                         default="720P", help="Video resolution (default: 720P)")
-    parser.add_argument("--image-url",
-                        help="Image for I2V first frame: URL, base64 data URL, or local file path")
+    parser.add_argument("--image-path",
+                        help="Image for I2V first frame: local file path (preferred) or URL. Prefer absolute local paths like C:/photos/cat.jpg. Do NOT upload images to free image hosting sites.")
+    parser.add_argument("--image-url", dest="image_path",
+                        help=argparse.SUPPRESS)  # deprecated alias, hidden from --help
     parser.add_argument("--reference-image", action="append", dest="reference_images",
-                        help="Reference image for R2V: URL, base64 data URL, or local file path (can specify 1-9 times)")
+                        help="Reference image for R2V: local file path (preferred) or URL (can specify 1-9 times)")
     parser.add_argument("--seed", type=int, help="Random seed for reproducibility")
     parser.add_argument("--api-key", help="DashScope API key (saved to .env file for future use)")
     parser.add_argument("--poll-interval", type=int, default=15,
@@ -534,8 +548,8 @@ Examples:
         sys.exit(1)
 
     # Validate model-specific requirements
-    if model_id == MODEL_I2V and not args.image_url:
-        logger.error("Error: I2V mode requires --image-url parameter")
+    if model_id == MODEL_I2V and not args.image_path:
+        logger.error("Error: I2V mode requires --image-path parameter")
         sys.exit(1)
 
     if model_id == MODEL_R2V and (not args.reference_images or len(args.reference_images) == 0):
@@ -572,7 +586,7 @@ Examples:
             ratio=args.ratio,
             duration=args.duration,
             resolution=args.resolution,
-            image_url=args.image_url,
+            image_url=args.image_path,
             reference_images=args.reference_images,
             seed=args.seed,
             api_key=args.api_key,

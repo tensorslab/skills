@@ -3,7 +3,7 @@
 Aliyun DashScope API Key Management Module
 
 Manages DASHSCOPE_API_KEY for Aliyun Bailian video generation.
-Reads and writes key exclusively from/to the .env file at the skills directory.
+Reads and writes key from/to ~/.ali/.env (user home directory).
 """
 
 import os
@@ -13,13 +13,9 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# Resolve paths relative to the skill directory
-# ali_auth.py is at skills/ali-video/scripts/ali_auth.py
-_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-_SKILL_DIR = os.path.dirname(_SCRIPT_DIR)      # skills/ali-video/
-_SKILLS_DIR = os.path.dirname(_SKILL_DIR)       # skills/
-
-ENV_FILE_PATH = os.path.join(_SKILLS_DIR, ".env")
+# Store .env in user home directory at ~/.ali/.env (global, easy to find)
+USER_CONFIG_DIR = os.path.expanduser("~/.ali")
+ENV_FILE_PATH = os.path.join(USER_CONFIG_DIR, ".env")
 DEFAULT_OUTPUT_DIR = Path(".") / "ali_output"
 
 # DashScope API constants
@@ -30,7 +26,7 @@ DASHSCOPE_TASK_ENDPOINT = f"{DASHSCOPE_API_BASE}/api/v1/tasks"
 
 def load_api_key_from_env() -> str | None:
     """
-    Load API key from .env file at skills directory.
+    Load API key from ~/.ali/.env file.
 
     Returns:
         The API key if found and valid (non-empty), None otherwise.
@@ -53,7 +49,7 @@ def load_api_key_from_env() -> str | None:
 
 
 def save_api_key_to_env(api_key: str):
-    """Save API key to .env file at skills directory for future sessions."""
+    """Save API key to ~/.ali/.env file for future sessions."""
     try:
         os.makedirs(os.path.dirname(ENV_FILE_PATH), exist_ok=True)
 
@@ -89,7 +85,7 @@ class AliAPIKeyError(Exception):
 
 def get_or_prompt_api_key() -> str:
     """
-    Get API key from .env file at skills directory.
+    Get API key from ~/.ali/.env file.
 
     Returns:
         The API key.

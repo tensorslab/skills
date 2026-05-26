@@ -29,14 +29,14 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" <args>
 
 ## Authorization
 
-The script reads the API key from the `.env` file at the skills directory. **Do NOT ask the user for an API key upfront.** Just run the script directly.
+The script reads the API key from `~/.ali/.env` (in the user's home directory). **Do NOT ask the user for an API key upfront.** Just run the script directly.
 
 If the script fails with an authentication error (invalid/expired key), THEN tell the user:
 1. Their API key is invalid or expired
 2. Get a new key from: https://bailian.console.aliyun.com/
 3. Pass directly: `--api-key YOUR_KEY`
 
-The key passed via `--api-key` is **automatically saved** to the `.env` file at the skills directory. Future sessions will pick it up without needing to pass the key again.
+The key passed via `--api-key` is **automatically saved** to `~/.ali/.env`. Future sessions will pick it up without needing to pass the key again.
 
 ## Models
 
@@ -55,7 +55,7 @@ Default mode: `t2v` (text-to-video)
 User request: "做一段 10 秒钟横屏的宇宙飞船穿梭星际的视频"
 
 **Constraints:**
-- Do NOT pass `--image-url` or `--reference-image` for T2V mode.
+- Do NOT pass `--image-path` or `--reference-image` for T2V mode.
 
 **Agent processing:**
 1. Extract parameters: `duration=10`, `ratio="16:9"`
@@ -76,19 +76,26 @@ movie-quality visual effects, smooth 24fps motion
 User request: "让这张人物合影 family.jpg 动起来" or "让风景照动起来"
 
 **Agent processing:**
-1. Verify image URL (must be a publicly accessible HTTP/HTTPS URL or base64 data URL)
+1. Verify image path (must be a valid local file or accessible URL)
 2. Enhance prompt with motion instructions
 3. Monitor progress with heartbeat updates
 4. Download results
 
 **Parameters for I2V:**
-- `--image-url`: First-frame image (required for I2V). Supports three formats:
-  - Public URL: `https://example.com/image.png`
-  - Base64 data URL: `data:image/png;base64,iVBORw0KGgo...`
-  - Local file path: `./my_image.jpg` (auto-converted to base64)
+- `--image-path`: First-frame image (required for I2V). Supports:
+  - Local file path (preferred): `C:/photos/cat.jpg` or `./my_image.jpg`
+  - HTTP/HTTPS URL: `https://example.com/image.png`
 - Prompt: Optional text describing desired motion/animation
 
+**Important:** Always prefer local absolute paths. Do NOT upload images to free image hosting sites to obtain a URL — this is unreliable and may expose private images.
+
 **Note:** I2V does not support `--ratio`. Output aspect ratio matches the input image.
+
+**Path validation:** When specifying image paths, use valid absolute paths for your OS:
+- Windows: `C:/Users/name/photos/cat.jpg` or `D:\photos\cat.jpg`
+- macOS/Linux: `/home/name/photos/cat.jpg`
+- Paths like `/c/Users/...` or `/d/photos/...` are incorrect on Windows — use `C:/Users/...` or `D:/photos/...` instead.
+- Always prefer local absolute paths. Do NOT upload images to free image hosting sites.
 
 **Image constraints:**
 - Formats: JPEG, JPG, PNG, WEBP
@@ -101,16 +108,15 @@ User request: "让这张人物合影 family.jpg 动起来" or "让风景照动�
 User request: "用这几张参考图生成一段视频" or "根据参考人物和场景生成视频"
 
 **Agent processing:**
-1. Collect 1-9 reference image URLs
+1. Collect 1-9 reference images (local paths preferred)
 2. Craft prompt using `[Image 1]`, `[Image 2]` tags to reference images by position
 3. Monitor progress with heartbeat updates
 4. Download results
 
 **Parameters for R2V:**
 - `--reference-image`: Reference images (1-9). Each supports:
-  - Public URL: `https://example.com/image.jpg`
-  - Base64 data URL: `data:image/jpeg;base64,...`
-  - Local file path: `./ref.jpg` (auto-converted to base64)
+  - Local file path (preferred): `C:/photos/ref.jpg` or `./ref.jpg`
+  - HTTP/HTTPS URL: `https://example.com/image.jpg`
 - Prompt: Must use `[Image N]` tags to reference images
 
 **Example prompt:**
@@ -189,11 +195,11 @@ Launch each task as a separate `ali_video.py` invocation **concurrently** (in pa
 
 ```bash
 # Launch all tasks in parallel (each in background)
-python "<skill_dir>/scripts/ali_video.py" --prompt-file ./batch_input/01_prompt.txt --model i2v --image-url ./batch_input/01_image.jpg --output-dir ./batch_output &
+python "<skill_dir>/scripts/ali_video.py" --prompt-file ./batch_input/01_prompt.txt --model i2v --image-path ./batch_input/01_image.jpg --output-dir ./batch_output &
 
-python "<skill_dir>/scripts/ali_video.py" --prompt-file ./batch_input/02_prompt.txt --model i2v --image-url ./batch_input/02_image.jpg --output-dir ./batch_output &
+python "<skill_dir>/scripts/ali_video.py" --prompt-file ./batch_input/02_prompt.txt --model i2v --image-path ./batch_input/02_image.jpg --output-dir ./batch_output &
 
-python "<skill_dir>/scripts/ali_video.py" --prompt-file ./batch_input/03_prompt.txt --model i2v --image-url ./batch_input/03_image.jpg --output-dir ./batch_output &
+python "<skill_dir>/scripts/ali_video.py" --prompt-file ./batch_input/03_prompt.txt --model i2v --image-path ./batch_input/03_image.jpg --output-dir ./batch_output &
 
 wait  # Wait for all background tasks to complete
 ```
@@ -222,20 +228,20 @@ python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a spaceship flying t
 # 10 second vertical video
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "sunset over ocean waves" --duration 10 --ratio 9:16
 
-# Image-to-video (I2V) with first-frame URL
-python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a cat running on grass" --model i2v --image-url https://example.com/cat.jpg
+# Image-to-video (I2V) with local image path (preferred)
+python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a cat running on grass" --model i2v --image-path C:/photos/cat.jpg
 
-# I2V with local image file (auto-converted to base64)
-python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "gentle waves" --model i2v --image-url ./my_photo.png
+# I2V with relative path
+python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "gentle waves" --model i2v --image-path ./my_photo.png
 
 # Reference-to-video (R2V) with multiple images
-python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "[Image 1] girl in dress holding [Image 2] fan" --model r2v --reference-image https://example.com/girl.jpg --reference-image https://example.com/fan.jpg
+python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "[Image 1] girl in dress holding [Image 2] fan" --model r2v --reference-image C:/photos/girl.jpg --reference-image C:/photos/fan.jpg
 
 # High quality 1080P
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "epic mountain timelapse" --resolution 1080P --duration 10
 
 # Read prompt from file (useful for long prompts or batch generation)
-python "<absolute_path_to_skill_dir>/scripts/ali_video.py" --prompt-file ./prompt.txt --model i2v --image-url ./photo.jpg
+python "<absolute_path_to_skill_dir>/scripts/ali_video.py" --prompt-file ./prompt.txt --model i2v --image-path ./photo.jpg
 
 # Custom output directory
 python "<absolute_path_to_skill_dir>/scripts/ali_video.py" "a sunset timelapse" --output-dir ./my_videos
